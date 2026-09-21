@@ -7,113 +7,260 @@
 
 <style>
 :root {
-  color-scheme:dark;
-  --cream:#eadfc9;
-  --muted:#b5b7a9;
-  --gold:#ddb67d;
+  color-scheme: dark;
+  --cream: #eadfc9;
+  --muted: #b5b7a9;
+  --gold: #ddb67d;
 }
-* { box-sizing:border-box }
+* {
+  box-sizing: border-box;
+}
 body {
-  margin:0; overflow:hidden; background:#151b19;
-  font-family:Tahoma,system-ui,sans-serif;
-  color:var(--cream);
+  margin: 0;
+  overflow: hidden;
+  background: #151b19;
+  font-family: Tahoma, system-ui, sans-serif;
+  color: var(--cream);
 }
-canvas { display:block; touch-action:none }
-button { font:inherit; cursor:pointer }
+canvas {
+  display: block;
+  touch-action: none;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
 #hud {
-  position:fixed; inset:0; pointer-events:none;
-  background:linear-gradient(
-    180deg,rgba(6,12,11,.48),transparent 24%,
-    transparent 72%,rgba(6,12,11,.64)
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(6,12,11,.48),
+    transparent 24%,
+    transparent 72%,
+    rgba(6,12,11,.64)
   );
 }
-.brand { position:absolute; left:32px; top:27px }
+.brand {
+  position: absolute;
+  left: 32px;
+  top: 27px;
+}
 .eyebrow {
-  font-size:10px; letter-spacing:4px;
-  color:#c4c3ad; text-transform:uppercase;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #c4c3ad;
+  text-transform: uppercase;
 }
 h1 {
-  font-family:Georgia,serif; font-weight:400;
-  letter-spacing:7px; font-size:33px; margin:8px 0;
+  font-family: Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 7px;
+  font-size: 33px;
+  margin: 8px 0;
 }
-.subtitle { font-size:12px; color:#c5c1b0 }
+.subtitle {
+  font-size: 12px;
+  color: #c5c1b0;
+}
 .progress {
-  position:absolute; top:33px; right:32px; text-align:right;
-  font-size:12px; line-height:1.9;
+  position: absolute;
+  top: 33px;
+  right: 32px;
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.9;
 }
-#dots { color:var(--gold); font-size:19px; letter-spacing:8px }
+#dots {
+  color: var(--gold);
+  font-size: 19px;
+  letter-spacing: 8px;
+}
 #area {
-  position:absolute; left:32px; bottom:88px;
-  font-size:11px; letter-spacing:2px; color:#d3c5a8;
+  position: absolute;
+  left: 32px;
+  bottom: 88px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #d3c5a8;
 }
 .controls {
-  position:absolute; bottom:25px; left:32px; right:32px;
-  display:flex; flex-wrap:wrap; gap:11px 20px;
-  color:#babdad; font-size:11px;
+  position: absolute;
+  bottom: 25px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px 20px;
+  color: #babdad;
+  font-size: 11px;
 }
 kbd {
-  font-family:inherit; color:#f1e5cd;
-  border-bottom:1px solid #a1a28b; padding:2px 4px; margin-right:4px;
+  font-family: inherit;
+  color: #f1e5cd;
+  border-bottom: 1px solid #a1a28b;
+  padding: 2px 4px;
+  margin-right: 4px;
 }
 #hint {
-  position:absolute; bottom:126px; left:50%;
-  transform:translateX(-50%); display:none;
-  padding:12px 23px; border:1px solid #d7c79a55;
-  border-radius:3px; background:#17201ee6;
-  font-size:13px; white-space:nowrap;
+  position: absolute;
+  bottom: 126px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  padding: 12px 23px;
+  border: 1px solid #d7c79a55;
+  border-radius: 3px;
+  background: #17201ee6;
+  font-size: 13px;
+  white-space: nowrap;
 }
 #toast {
-  position:absolute; top:135px; left:50%; transform:translateX(-50%);
-  max-width:85vw; text-align:center; font-size:13px;
-  color:#f2dfb5; padding:12px 20px;
-  background:#14201cd9; opacity:0; transition:opacity .25s;
+  position: absolute;
+  top: 135px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 85vw;
+  text-align: center;
+  font-size: 13px;
+  color: #f2dfb5;
+  padding: 12px 20px;
+  background: #14201cd9;
+  opacity: 0;
+  transition: opacity .25s;
 }
 #dialog {
-  display:none; position:absolute;
-  bottom:113px; left:50%; transform:translateX(-50%);
-  width:min(620px,88vw); background:#13201ef2;
-  border:1px solid #b9b19577; padding:22px 27px;
-  box-shadow:0 16px 60px #0007;
+  display: none;
+  position: absolute;
+  bottom: 113px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(620px,88vw);
+  background: #13201ef2;
+  border: 1px solid #b9b19577;
+  padding: 22px 27px;
+  box-shadow: 0 16px 60px #0007;
 }
 #speaker {
-  font-size:12px; color:#e4b77c; letter-spacing:2px;
-  padding-bottom:12px; border-bottom:1px solid #c7b99133;
+  font-size: 12px;
+  color: #e4b77c;
+  letter-spacing: 2px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #c7b99133;
 }
-#line { font-size:16px; line-height:1.9; margin:15px 0 20px }
-#next { text-align:right; font-size:10px; color:#aeb5a3 }
+#line {
+  font-size: 16px;
+  line-height: 1.9;
+  margin: 15px 0 20px;
+}
+#next {
+  text-align: right;
+  font-size: 10px;
+  color: #aeb5a3;
+}
 #journal {
-  display:none; position:absolute; right:32px; top:120px;
-  width:min(340px,85vw); padding:24px;
-  background:#18201ded; border:1px solid #c5b78f55;
+  display: none;
+  position: absolute;
+  right: 32px;
+  top: 120px;
+  width: min(340px,85vw);
+  max-height: 65vh;
+  overflow: auto;
+  padding: 24px;
+  background: #18201ded;
+  border: 1px solid #c5b78f55;
+  pointer-events: auto;
 }
-#journal h2 { font-family:Georgia,serif; font-size:23px; font-weight:400 }
-.entry { padding:13px 0; border-top:1px solid #c5b78f33; line-height:1.7; font-size:12px }
-.entry small { display:block; color:#acb6a2; margin-top:5px }
+#journal h2 {
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 400;
+}
+.entry {
+  padding: 13px 0;
+  border-top: 1px solid #c5b78f33;
+  line-height: 1.7;
+  font-size: 12px;
+}
+.entry small {
+  display: block;
+  color: #acb6a2;
+  margin-top: 5px;
+}
 #cover {
-  position:fixed; inset:0; display:grid; place-items:center;
-  background:linear-gradient(90deg,#09110eed,#111a14ab);
-  z-index:5;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(90deg,#09110eed,#111a14ab);
+  z-index: 5;
 }
-.intro { padding:35px; width:min(550px,94vw) }
+.intro {
+  padding: 35px;
+  width: min(550px,94vw);
+}
 .intro h2 {
-  font-family:Georgia,serif; font-weight:400;
-  font-size:clamp(38px,7vw,62px); letter-spacing:7px; margin:17px 0;
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(38px,7vw,62px);
+  letter-spacing: 7px;
+  margin: 17px 0;
 }
-.intro p { color:#bcc3b2; font-size:14px; line-height:1.9 }
+.intro p {
+  color: #bcc3b2;
+  font-size: 14px;
+  line-height: 1.9;
+}
 #play {
-  margin-top:18px; padding:13px 28px; color:#17201a;
-  background:#dec596; border:0; border-radius:2px;
+  margin-top: 18px;
+  padding: 13px 28px;
+  color: #17201a;
+  background: #dec596;
+  border: 0;
+  border-radius: 2px;
 }
-#play:disabled { opacity:.5; cursor:wait }
-#status { font-size:11px; color:#b7bca8; margin-top:15px; line-height:1.8 }
-.clean #hud { visibility:hidden }
+#play:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+#status {
+  font-size: 11px;
+  color: #b7bca8;
+  margin-top: 15px;
+  line-height: 1.8;
+}
+.clean #hud {
+  visibility: hidden;
+}
 @media(max-width:650px) {
-  .brand { left:18px; top:18px }
-  h1 { font-size:24px; letter-spacing:4px }
-  .progress { right:18px; top:98px }
-  .controls { left:18px; bottom:18px; gap:8px 12px; font-size:10px }
-  #area { left:18px; bottom:120px }
-  #hint { bottom:160px; max-width:92vw; white-space:normal }
+  .brand {
+    left: 18px;
+    top: 18px;
+  }
+  h1 {
+    font-size: 24px;
+    letter-spacing: 4px;
+  }
+  .progress {
+    right: 18px;
+    top: 98px;
+  }
+  .controls {
+    left: 18px;
+    bottom: 18px;
+    gap: 8px 12px;
+    font-size: 10px;
+  }
+  #area {
+    left: 18px;
+    bottom: 120px;
+  }
+  #hint {
+    bottom: 160px;
+    max-width: 92vw;
+    white-space: normal;
+  }
 }
 </style>
 
@@ -139,7 +286,9 @@ kbd {
       ปีนขึ้นไปดูหลังคา แล้วหาที่อุ่น ๆ พักเท้า
     </p>
     <button id="play" disabled>กำลังเตรียมตรอก…</button>
-    <div id="status">กำลังโหลดฉาก • ใช้คีย์บอร์ดและเมาส์บนคอมพิวเตอร์</div>
+    <div id="status">
+      กำลังโหลดฉาก • ใช้คีย์บอร์ดและเมาส์บนคอมพิวเตอร์
+    </div>
   </div>
 </div>
 
@@ -149,20 +298,25 @@ kbd {
     <h1>AFTERLIGHT</h1>
     <div class="subtitle">ตรอกอุ่นไอ</div>
   </div>
+
   <div class="progress">
     <div>เรื่องเล่าในตรอก <span id="counter">0 / 4</span></div>
     <div id="dots">○○○○</div>
     <div style="color:#a8b5a2">J · เปิดสมุดบันทึก</div>
   </div>
+
   <div id="toast"></div>
   <div id="area">ทางเข้าตรอก</div>
   <div id="hint"></div>
+
   <div id="dialog">
     <div id="speaker"></div>
     <div id="line"></div>
     <div id="next">E · อ่านต่อ / ปิด &nbsp;&nbsp; ESC · ปิด</div>
   </div>
+
   <div id="journal"></div>
+
   <div class="controls">
     <span><kbd>WASD</kbd> เดิน</span>
     <span><kbd>SHIFT</kbd> วิ่ง</span>
@@ -173,16 +327,21 @@ kbd {
     <span><kbd>H</kbd> ซ่อน UI</span>
     <span><kbd>R</kbd> กลับทางเข้า</span>
     <span>ลากเมาส์ · หมุนกล้อง</span>
+    <span>ล้อเมาส์ · ซูม</span>
   </div>
 </div>
 
 <script type="module">
-const $ = s => document.querySelector(s);
+const $ = selector => document.querySelector(selector);
 
 try {
   const T = await import('three');
+
   const [
-    { EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }
+    { EffectComposer },
+    { RenderPass },
+    { UnrealBloomPass },
+    { OutputPass }
   ] = await Promise.all([
     import('three/addons/postprocessing/EffectComposer.js'),
     import('three/addons/postprocessing/RenderPass.js'),
@@ -190,14 +349,14 @@ try {
     import('three/addons/postprocessing/OutputPass.js')
   ]);
 
-  // ------------------------------------------------------------
+  // ============================================================
   // Renderer and atmosphere
-  // ------------------------------------------------------------
+  // ============================================================
   const scene = new T.Scene();
   scene.background = new T.Color('#29312b');
   scene.fog = new T.FogExp2('#29312b', .032);
 
-  const renderer = new T.WebGLRenderer({ antialias:true });
+  const renderer = new T.WebGLRenderer({ antialias: true });
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.35));
   renderer.shadowMap.enabled = true;
@@ -213,7 +372,8 @@ try {
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
   composer.addPass(new UnrealBloomPass(
-    new T.Vector2(innerWidth, innerHeight), .28, .55, 1.05
+    new T.Vector2(innerWidth, innerHeight),
+    .28, .55, 1.05
   ));
   composer.addPass(new OutputPass());
 
@@ -223,1072 +383,2533 @@ try {
   sky.position.set(-3, 15, 5);
   sky.castShadow = true;
   sky.shadow.mapSize.set(2048, 2048);
+
   Object.assign(sky.shadow.camera, {
-    left:-10, right:10, top:18, bottom:-18, near:.5, far:45
+    left: -10,
+    right: 10,
+    top: 18,
+    bottom: -18,
+    near: .5,
+    far: 45
   });
+
   sky.shadow.normalBias = .035;
   sky.shadow.bias = -.00015;
   sky.target.position.set(0, 0, -2);
   scene.add(sky, sky.target);
 
-  // Repeatable random generation.
+  // Repeatable environment generation.
   let seed = 17429;
+
   function random() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
     return seed / 4294967296;
   }
-  const range = (a,b) => a + random() * (b-a);
-  const V = (x=0,y=0,z=0) => new T.Vector3(x,y,z);
 
-  // ------------------------------------------------------------
-  // Procedural surface textures
-  // ------------------------------------------------------------
+  const range = (a, b) => a + random() * (b - a);
+  const V = (x = 0, y = 0, z = 0) => new T.Vector3(x, y, z);
+
+  // ============================================================
+  // Procedural environment textures
+  // ============================================================
   function canvasTexture(size, draw) {
-    const c = document.createElement('canvas');
-    c.width = c.height = size;
-    draw(c.getContext('2d'), size);
-    const texture = new T.CanvasTexture(c);
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    draw(canvas.getContext('2d'), size);
+
+    const texture = new T.CanvasTexture(canvas);
     texture.colorSpace = T.SRGBColorSpace;
     texture.wrapS = texture.wrapT = T.RepeatWrapping;
-    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    texture.anisotropy = Math.min(
+      8, renderer.capabilities.getMaxAnisotropy()
+    );
     return texture;
   }
 
-  function weathered(base, kind='wall') {
-    return canvasTexture(512, (c,n) => {
-      c.fillStyle=base; c.fillRect(0,0,n,n);
+  function weathered(base, kind = 'wall') {
+    return canvasTexture(512, (ctx, n) => {
+      ctx.fillStyle = base;
+      ctx.fillRect(0, 0, n, n);
 
-      // Fine grain.
-      for(let i=0;i<18000;i++) {
-        const light=random()>.5;
-        c.fillStyle=light?'rgba(225,211,174,.07)':'rgba(16,25,20,.08)';
-        const s=range(1,4);
-        c.fillRect(random()*n,random()*n,s,s);
+      for (let i = 0; i < 18000; i++) {
+        ctx.fillStyle = random() > .5
+          ? 'rgba(225,211,174,.07)'
+          : 'rgba(16,25,20,.08)';
+
+        const size = range(1, 4);
+        ctx.fillRect(random() * n, random() * n, size, size);
       }
 
-      // Uneven stains and flaking paint.
-      for(let i=0;i<125;i++) {
-        c.fillStyle=i%3 ? 'rgba(30,37,25,.09)' : 'rgba(173,145,101,.14)';
-        const x=random()*n, y=random()*n, r=range(5,50);
-        c.beginPath();
-        for(let j=0;j<9;j++) {
-          const a=j/9*Math.PI*2, rr=r*range(.45,1.1);
-          const px=x+Math.cos(a)*rr, py=y+Math.sin(a)*rr;
-          if(j===0)c.moveTo(px,py); else c.lineTo(px,py);
+      for (let i = 0; i < 125; i++) {
+        ctx.fillStyle = i % 3
+          ? 'rgba(30,37,25,.09)'
+          : 'rgba(173,145,101,.14)';
+
+        const x = random() * n;
+        const y = random() * n;
+        const radius = range(5, 50);
+
+        ctx.beginPath();
+
+        for (let j = 0; j < 9; j++) {
+          const angle = j / 9 * Math.PI * 2;
+          const r = radius * range(.45, 1.1);
+          const px = x + Math.cos(angle) * r;
+          const py = y + Math.sin(angle) * r;
+
+          if (j === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
         }
-        c.closePath(); c.fill();
+
+        ctx.closePath();
+        ctx.fill();
       }
 
-      // Hairline cracks and water streaks.
-      c.strokeStyle='rgba(20,24,19,.3)';
-      c.lineWidth=1;
-      for(let i=0;i<19;i++) {
-        let x=random()*n, y=random()*n;
-        c.beginPath(); c.moveTo(x,y);
-        for(let j=0;j<7;j++) {
-          x+=range(-12,12); y+=range(3,17); c.lineTo(x,y);
+      ctx.strokeStyle = 'rgba(20,24,19,.3)';
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < 19; i++) {
+        let x = random() * n;
+        let y = random() * n;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        for (let j = 0; j < 7; j++) {
+          x += range(-12, 12);
+          y += range(3, 17);
+          ctx.lineTo(x, y);
         }
-        c.stroke();
-      }
-      for(let i=0;i<35;i++) {
-        c.fillStyle='rgba(20,31,23,.08)';
-        c.fillRect(random()*n,0,range(1,8),range(20,220));
+
+        ctx.stroke();
       }
 
-      if(kind==='floor') {
-        c.strokeStyle='rgba(14,22,19,.5)'; c.lineWidth=4;
-        c.strokeRect(2,2,252,252); c.strokeRect(258,2,252,252);
-        c.strokeRect(2,258,252,252); c.strokeRect(258,258,252,252);
-        c.strokeStyle='rgba(206,193,151,.12)'; c.lineWidth=2;
-        c.strokeRect(6,6,242,242);
+      for (let i = 0; i < 35; i++) {
+        ctx.fillStyle = 'rgba(20,31,23,.08)';
+        ctx.fillRect(
+          random() * n, 0,
+          range(1, 8), range(20, 220)
+        );
       }
-      if(kind==='metal') {
-        for(let i=0;i<45;i++) {
-          c.fillStyle='rgba(124,66,35,.23)';
-          c.fillRect(random()*n,random()*n,range(3,13),range(12,100));
+
+      if (kind === 'floor') {
+        ctx.strokeStyle = 'rgba(14,22,19,.5)';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(2, 2, 252, 252);
+        ctx.strokeRect(258, 2, 252, 252);
+        ctx.strokeRect(2, 258, 252, 252);
+        ctx.strokeRect(258, 258, 252, 252);
+
+        ctx.strokeStyle = 'rgba(206,193,151,.12)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(6, 6, 242, 242);
+      }
+
+      if (kind === 'metal') {
+        for (let i = 0; i < 45; i++) {
+          ctx.fillStyle = 'rgba(124,66,35,.23)';
+          ctx.fillRect(
+            random() * n, random() * n,
+            range(3, 13), range(12, 100)
+          );
         }
       }
     });
   }
 
   function fabricTexture() {
-    return canvasTexture(512,(c,n)=>{
-      c.fillStyle='#7b4635'; c.fillRect(0,0,n,n);
-      for(let y=0;y<n;y+=64) for(let x=0;x<n;x+=64) {
-        c.save(); c.translate(x+32,y+32); c.rotate(Math.PI/4);
-        c.strokeStyle='#c2a16b'; c.lineWidth=5; c.strokeRect(-20,-20,40,40);
-        c.strokeStyle='#343d35'; c.lineWidth=5; c.strokeRect(-11,-11,22,22);
-        c.fillStyle='#cab47e'; c.fillRect(-3,-3,6,6); c.restore();
-      }
-      for(let i=0;i<n;i+=3) {
-        c.fillStyle='rgba(225,210,171,.12)'; c.fillRect(0,i,n,1);
-        c.fillStyle='rgba(16,25,20,.13)'; c.fillRect(i,0,1,n);
-      }
-      c.strokeStyle='#c6a36b'; c.lineWidth=14; c.strokeRect(15,15,n-30,n-30);
-      c.strokeStyle='#333d35'; c.lineWidth=7; c.strokeRect(32,32,n-64,n-64);
-    });
-  }
+    return canvasTexture(512, (ctx, n) => {
+      ctx.fillStyle = '#7b4635';
+      ctx.fillRect(0, 0, n, n);
 
-  function calicoTexture() {
-    return canvasTexture(512,(c,n)=>{
-      c.fillStyle='#e6ddc5'; c.fillRect(0,0,n,n);
-      for(let i=0;i<15;i++) {
-        c.fillStyle=i%3===0?'#343533':'#b87337';
-        const x=range(0,n), y=range(0,n), r=range(23,72);
-        c.beginPath();
-        for(let j=0;j<18;j++) {
-          const a=j/18*Math.PI*2;
-          const rr=r*(.8+.2*Math.sin(j*2.1+i));
-          const px=x+Math.cos(a)*rr, py=y+Math.sin(a)*rr*.72;
-          if(!j)c.moveTo(px,py); else c.lineTo(px,py);
+      for (let y = 0; y < n; y += 64) {
+        for (let x = 0; x < n; x += 64) {
+          ctx.save();
+          ctx.translate(x + 32, y + 32);
+          ctx.rotate(Math.PI / 4);
+
+          ctx.strokeStyle = '#c2a16b';
+          ctx.lineWidth = 5;
+          ctx.strokeRect(-20, -20, 40, 40);
+
+          ctx.strokeStyle = '#343d35';
+          ctx.strokeRect(-11, -11, 22, 22);
+
+          ctx.fillStyle = '#cab47e';
+          ctx.fillRect(-3, -3, 6, 6);
+          ctx.restore();
         }
-        c.closePath(); c.fill();
       }
-      for(let i=0;i<18000;i++) {
-        c.strokeStyle=i%2?'rgba(255,239,202,.09)':'rgba(42,31,22,.055)';
-        const x=random()*n,y=random()*n;
-        c.beginPath(); c.moveTo(x,y); c.lineTo(x+range(-1,1),y+range(2,5)); c.stroke();
+
+      for (let i = 0; i < n; i += 3) {
+        ctx.fillStyle = 'rgba(225,210,171,.12)';
+        ctx.fillRect(0, i, n, 1);
+
+        ctx.fillStyle = 'rgba(16,25,20,.13)';
+        ctx.fillRect(i, 0, 1, n);
       }
+
+      ctx.strokeStyle = '#c6a36b';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(15, 15, n - 30, n - 30);
+
+      ctx.strokeStyle = '#333d35';
+      ctx.lineWidth = 7;
+      ctx.strokeRect(32, 32, n - 64, n - 64);
     });
   }
 
-  const material = (color, roughness=.8, metalness=0) =>
-    new T.MeshStandardMaterial({color,roughness,metalness});
+  const material = (color, roughness = .8, metalness = 0) =>
+    new T.MeshStandardMaterial({ color, roughness, metalness });
 
-  function textured(texture, color='#ffffff', roughness=.9, metalness=0) {
+  function textured(
+    texture, color = '#ffffff', roughness = .9, metalness = 0
+  ) {
     return new T.MeshStandardMaterial({
-      color,map:texture,bumpMap:texture,bumpScale:.025,roughness,metalness
+      color,
+      map: texture,
+      bumpMap: texture,
+      bumpScale: .025,
+      roughness,
+      metalness
     });
   }
 
   const plaster = textured(weathered('#7c7961'));
   const greenWall = textured(weathered('#476359'));
   const ochreWall = textured(weathered('#857052'));
-  const rust = textured(weathered('#655b47','metal'),'#ffffff',.7,.45);
+  const rust = textured(
+    weathered('#655b47', 'metal'), '#ffffff', .7, .45
+  );
   const wood = textured(weathered('#6a5038'));
-  const floorTex = weathered('#626253','floor');
-  floorTex.repeat.set(5,12);
-  const floorMat = textured(floorTex,'#b4b3a1',.38,.15);
-  const rugMat = textured(fabricTexture(),'#b7a18d',1);
-  const dark = material('#242c27',.85,.25);
-  const steel = material('#646e62',.55,.65);
-  const black = material('#171e1b',.8);
+
+  const floorTex = weathered('#626253', 'floor');
+  floorTex.repeat.set(5, 12);
+
+  const floorMat = textured(floorTex, '#b4b3a1', .38, .15);
+  const rugMat = textured(fabricTexture(), '#b7a18d', 1);
+
+  const dark = material('#242c27', .85, .25);
+  const steel = material('#646e62', .55, .65);
+  const black = material('#171e1b', .8);
   const terra = material('#895943');
   const leafMat = material('#536c42');
   const leafLight = material('#6b7946');
 
-  const emit = (color, strength=3) => new T.MeshStandardMaterial({
-    color,emissive:color,emissiveIntensity:strength,roughness:.4
-  });
-  const warm = emit('#ffc581',3.3);
-  const teal = emit('#80daca',2.4);
+  const emit = (color, strength = 3) =>
+    new T.MeshStandardMaterial({
+      color,
+      emissive: color,
+      emissiveIntensity: strength,
+      roughness: .4
+    });
 
-  // ------------------------------------------------------------
-  // Shared geometry, collisions, static batching
-  // ------------------------------------------------------------
-  const unitBox = new T.BoxGeometry(1,1,1);
-  const unitSphere = new T.SphereGeometry(1,16,12);
-  const unitCylinder = new T.CylinderGeometry(1,1,1,10);
+  const warm = emit('#ffc581', 3.3);
+  const teal = emit('#80daca', 2.4);
+
+  // ============================================================
+  // Shared geometry, collisions and static batching
+  // ============================================================
+  const unitBox = new T.BoxGeometry(1, 1, 1);
+  const unitSphere = new T.SphereGeometry(1, 16, 12);
+  const unitCylinder = new T.CylinderGeometry(1, 1, 1, 10);
+
   const staticMeshes = [];
   const solids = [];
 
-  function register(mesh,parent=scene) {
+  function register(mesh, parent = scene) {
     parent.add(mesh);
-    mesh.castShadow=true; mesh.receiveShadow=true;
-    if(parent===scene)staticMeshes.push(mesh);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    if (parent === scene) staticMeshes.push(mesh);
     return mesh;
   }
 
-  function cube(w,h,d,x,y,z,mat,solid=false,parent=scene) {
-    const mesh=new T.Mesh(unitBox,mat);
-    mesh.scale.set(w,h,d); mesh.position.set(x,y,z);
-    register(mesh,parent);
-    if(solid) {
+  function cube(
+    w, h, d, x, y, z, mat,
+    solid = false, parent = scene
+  ) {
+    const mesh = new T.Mesh(unitBox, mat);
+    mesh.scale.set(w, h, d);
+    mesh.position.set(x, y, z);
+    register(mesh, parent);
+
+    if (solid) {
       solids.push({
-        minX:x-w/2,maxX:x+w/2,minZ:z-d/2,maxZ:z+d/2,
-        bottom:y-h/2,top:y+h/2,
-        box:new T.Box3(V(x-w/2,y-h/2,z-d/2),V(x+w/2,y+h/2,z+d/2))
+        minX: x - w / 2,
+        maxX: x + w / 2,
+        minZ: z - d / 2,
+        maxZ: z + d / 2,
+        bottom: y - h / 2,
+        top: y + h / 2,
+        box: new T.Box3(
+          V(x - w / 2, y - h / 2, z - d / 2),
+          V(x + w / 2, y + h / 2, z + d / 2)
+        )
       });
     }
+
     return mesh;
   }
 
-  function sphere(x,y,z,sx,sy,sz,mat,parent=scene) {
-    const mesh=new T.Mesh(unitSphere,mat);
-    mesh.position.set(x,y,z); mesh.scale.set(sx,sy,sz);
-    return register(mesh,parent);
+  function sphere(
+    x, y, z, sx, sy, sz, mat, parent = scene
+  ) {
+    const mesh = new T.Mesh(unitSphere, mat);
+    mesh.position.set(x, y, z);
+    mesh.scale.set(sx, sy, sz);
+    return register(mesh, parent);
   }
 
-  function rod(a,b,r,mat,parent=scene) {
-    const mesh=new T.Mesh(unitCylinder,mat);
-    const direction=b.clone().sub(a);
+  function rod(a, b, radius, mat, parent = scene) {
+    const mesh = new T.Mesh(unitCylinder, mat);
+    const direction = b.clone().sub(a);
+
     mesh.position.copy(a).add(b).multiplyScalar(.5);
-    mesh.scale.set(r,direction.length(),r);
-    mesh.quaternion.setFromUnitVectors(V(0,1,0),direction.normalize());
-    return register(mesh,parent);
+    mesh.scale.set(radius, direction.length(), radius);
+    mesh.quaternion.setFromUnitVectors(
+      V(0, 1, 0), direction.normalize()
+    );
+
+    return register(mesh, parent);
   }
 
-  function wire(points,r=.018,mat=black) {
-    const mesh=new T.Mesh(
-      new T.TubeGeometry(new T.CatmullRomCurve3(points),24,r,5,false),mat
+  function wire(points, radius = .018, mat = black) {
+    const mesh = new T.Mesh(
+      new T.TubeGeometry(
+        new T.CatmullRomCurve3(points), 24, radius, 5, false
+      ),
+      mat
     );
     scene.add(mesh);
     return mesh;
   }
 
   function batchStatics() {
-    const groups=new Map();
-    for(const mesh of staticMeshes) {
-      const key=mesh.geometry.uuid+mesh.material.uuid;
-      if(!groups.has(key))groups.set(key,[]);
+    const groups = new Map();
+
+    for (const mesh of staticMeshes) {
+      const key = mesh.geometry.uuid + mesh.material.uuid;
+      if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(mesh);
     }
-    for(const list of groups.values()) {
-      const batch=new T.InstancedMesh(
-        list[0].geometry,list[0].material,list.length
+
+    for (const list of groups.values()) {
+      const batch = new T.InstancedMesh(
+        list[0].geometry,
+        list[0].material,
+        list.length
       );
-      list.forEach((mesh,i)=>{
+
+      list.forEach((mesh, i) => {
         mesh.updateMatrix();
-        batch.setMatrixAt(i,mesh.matrix);
+        batch.setMatrixAt(i, mesh.matrix);
         scene.remove(mesh);
       });
-      batch.castShadow=true; batch.receiveShadow=true;
+
+      batch.instanceMatrix.needsUpdate = true;
+      batch.castShadow = true;
+      batch.receiveShadow = true;
       batch.computeBoundingSphere();
       scene.add(batch);
     }
-    staticMeshes.length=0;
+
+    staticMeshes.length = 0;
   }
 
-  function light(x,y,z,color,power=26,distance=9) {
-    const l=new T.PointLight(color,power,distance,2);
-    l.position.set(x,y,z); scene.add(l);
-    return l;
+  function light(
+    x, y, z, color, power = 26, distance = 9
+  ) {
+    const lamp = new T.PointLight(color, power, distance, 2);
+    lamp.position.set(x, y, z);
+    scene.add(lamp);
+    return lamp;
   }
 
-  function wallLamp(x,y,z,color='#ffbf78') {
-    cube(.32,.11,.4,x,y+.13,z,dark);
-    sphere(x,y,z,.11,.13,.11,warm);
-    light(x,y-.08,z,color,28,8);
+  function wallLamp(x, y, z, color = '#ffbf78') {
+    cube(.32, .11, .4, x, y + .13, z, dark);
+    sphere(x, y, z, .11, .13, .11, warm);
+    light(x, y - .08, z, color, 28, 8);
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // Alley shell
-  // ------------------------------------------------------------
-  cube(12,.2,28,0,-.1,0,floorMat);
-  cube(.5,14,28,-6.25,7,0,plaster,true);
-  cube(.5,14,28, 6.25,7,0,ochreWall,true);
-  cube(12,14,.5,0,7,-14.25,greenWall,true);
-  cube(12,14,.5,0,7,14.25,plaster,true);
+  // ============================================================
+  cube(12, .2, 28, 0, -.1, 0, floorMat);
 
-  // Thin drainage channels.
-  for(const x of [-2.8,2.8]) {
-    cube(.22,.012,27,x,.009,0,dark);
-    for(let z=-13;z<14;z+=.35)cube(.18,.014,.035,x,.018,z,steel);
+  cube(.5, 14, 28, -6.25, 7, 0, plaster, true);
+  cube(.5, 14, 28, 6.25, 7, 0, ochreWall, true);
+  cube(12, 14, .5, 0, 7, -14.25, greenWall, true);
+  cube(12, 14, .5, 0, 7, 14.25, plaster, true);
+
+  for (const x of [-2.8, 2.8]) {
+    cube(.22, .012, 27, x, .009, 0, dark);
+
+    for (let z = -13; z < 14; z += .35) {
+      cube(.18, .014, .035, x, .018, z, steel);
+    }
   }
 
-  // Wet patches: irregular, dark, glossy surface overlays.
-  const puddleMat=new T.MeshStandardMaterial({
-    color:'#3d4a41',roughness:.08,metalness:.48,
-    transparent:true,opacity:.62,depthWrite:false
+  const puddleMat = new T.MeshStandardMaterial({
+    color: '#3d4a41',
+    roughness: .08,
+    metalness: .48,
+    transparent: true,
+    opacity: .62,
+    depthWrite: false
   });
-  const puddleGeo=new T.CircleGeometry(1,20);
-  for(let i=0;i<24;i++) {
-    const p=new T.Mesh(puddleGeo,puddleMat);
-    p.rotation.x=-Math.PI/2;
-    p.scale.set(range(.18,.8),range(.3,1.3),1);
-    p.position.set(range(-2.4,2.4),.014,range(-13,13));
-    scene.add(p);
+
+  const puddleGeo = new T.CircleGeometry(1, 20);
+
+  for (let i = 0; i < 24; i++) {
+    const puddle = new T.Mesh(puddleGeo, puddleMat);
+    puddle.rotation.x = -Math.PI / 2;
+    puddle.scale.set(range(.18, .8), range(.3, 1.3), 1);
+    puddle.position.set(
+      range(-2.4, 2.4), .014, range(-13, 13)
+    );
+    scene.add(puddle);
   }
 
-  // Building facade rhythm, windows, shutters, ACs.
-  for(const side of [-1,1]) {
-    for(let z=-11;z<=11;z+=4.5) {
-      const panelMat=(Math.round(z*2)%3===0)?greenWall:plaster;
-      cube(.15,8.8,4.1,side*5.94,4.4,z,panelMat);
+  // Windows, shutters, air conditioners and pipes.
+  for (const side of [-1, 1]) {
+    for (let z = -11; z <= 11; z += 4.5) {
+      const panelMat = Math.round(z * 2) % 3 === 0
+        ? greenWall : plaster;
 
-      // Ground-floor shutter.
-      cube(.16,2.45,2.15,side*5.78,1.225,z,rust);
-      for(let y=.12;y<2.5;y+=.16)
-        cube(.19,.035,2.06,side*5.67,y,z,dark);
+      cube(.15, 8.8, 4.1, side * 5.94, 4.4, z, panelMat);
+      cube(.16, 2.45, 2.15, side * 5.78, 1.225, z, rust);
 
-      // Upper window recess with iron bars.
-      cube(.19,1.65,1.8,side*5.72,5.4,z,dark);
-      cube(.20,1.42,1.58,side*5.59,5.4,z,greenWall);
-      for(let k=-2;k<=2;k++)
-        cube(.08,1.62,.035,side*5.44,5.4,z+k*.31,steel);
-      cube(.09,.045,1.75,side*5.44,5.4,z,steel);
-      cube(.35,.1,2.0,side*5.6,4.54,z,rust);
+      for (let y = .12; y < 2.5; y += .16) {
+        cube(.19, .035, 2.06, side * 5.67, y, z, dark);
+      }
 
-      // AC casing and fan.
-      cube(.62,.73,1.12,side*5.55,3.65,z+1.1,rust);
-      const fan=sphere(side*5.2,3.65,z+1.1,.025,.25,.25,dark);
-      for(let k=-2;k<=2;k++)
-        cube(.035,.045,.82,side*5.16,3.65+k*.115,z+1.1,steel);
-      rod(V(side*5.72,3.4,z+1.4),V(side*5.72,.3,z+1.4),.035,rust);
+      cube(.19, 1.65, 1.8, side * 5.72, 5.4, z, dark);
+      cube(.20, 1.42, 1.58, side * 5.59, 5.4, z, greenWall);
 
-      // Corrugated awning.
-      const awning=cube(1.3,.07,2.75,side*5.3,2.8,z,rust);
-      awning.rotation.z=side*.15;
-      for(let k=0;k<12;k++) {
-        const strip=cube(1.32,.035,.027,side*5.3,2.86,z-1.25+k*.23,steel);
-        strip.rotation.z=side*.15;
+      for (let k = -2; k <= 2; k++) {
+        cube(
+          .08, 1.62, .035,
+          side * 5.44, 5.4, z + k * .31, steel
+        );
+      }
+
+      cube(.09, .045, 1.75, side * 5.44, 5.4, z, steel);
+      cube(.35, .1, 2, side * 5.6, 4.54, z, rust);
+
+      cube(.62, .73, 1.12, side * 5.55, 3.65, z + 1.1, rust);
+      sphere(
+        side * 5.2, 3.65, z + 1.1,
+        .025, .25, .25, dark
+      );
+
+      for (let k = -2; k <= 2; k++) {
+        cube(
+          .035, .045, .82,
+          side * 5.16, 3.65 + k * .115, z + 1.1, steel
+        );
+      }
+
+      rod(
+        V(side * 5.72, 3.4, z + 1.4),
+        V(side * 5.72, .3, z + 1.4),
+        .035, rust
+      );
+
+      const awning = cube(
+        1.3, .07, 2.75, side * 5.3, 2.8, z, rust
+      );
+      awning.rotation.z = side * .15;
+
+      for (let k = 0; k < 12; k++) {
+        const strip = cube(
+          1.32, .035, .027,
+          side * 5.3, 2.86, z - 1.25 + k * .23, steel
+        );
+        strip.rotation.z = side * .15;
       }
     }
 
-    // Large service pipes.
-    rod(V(side*5.7,.2,-12),V(side*5.7,10,-12),.115,rust);
-    rod(V(side*5.68,4.1,-12),V(side*5.68,4.1,12),.065,rust);
-    for(let y=1;y<10;y+=1.7)
-      cube(.29,.06,.34,side*5.69,y,-12,steel);
-  }
+    rod(
+      V(side * 5.7, .2, -12),
+      V(side * 5.7, 10, -12),
+      .115, rust
+    );
 
-  // Distant upper towers are scenery, not accessible buildings.
-  for(let i=0;i<7;i++) {
-    const x=-12+i*4;
-    const h=range(14,23);
-    cube(3.5,h,4,x,h/2,-18, i%2?greenWall:plaster);
-    for(let y=7;y<h-1;y+=2.5) {
-      cube(.65,.95,.05,x-.75,y,-15.96,dark);
-      cube(.65,.95,.05,x+.75,y,-15.96, i%3===0?teal:dark);
+    rod(
+      V(side * 5.68, 4.1, -12),
+      V(side * 5.68, 4.1, 12),
+      .065, rust
+    );
+
+    for (let y = 1; y < 10; y += 1.7) {
+      cube(.29, .06, .34, side * 5.69, y, -12, steel);
     }
   }
 
-  // ------------------------------------------------------------
-  // Signs and posters, all drawn locally
-  // ------------------------------------------------------------
-  function poster(text,sub,color='#c7b485',lit=false) {
-    const c=document.createElement('canvas');
-    c.width=512;c.height=320;
-    const q=c.getContext('2d');
-    q.fillStyle=lit?'#173830':color;q.fillRect(0,0,512,320);
-    q.strokeStyle=lit?'#9fddbc':'#514c39';q.lineWidth=9;
-    q.strokeRect(13,13,486,294);
-    q.fillStyle=lit?'#b4e9cb':'#423e30';
-    q.textAlign='center';q.font='bold 57px sans-serif';
-    q.fillText(text,256,145);
-    q.font='21px monospace';q.fillText(sub,256,207);
-    for(let i=0;i<1800;i++) {
-      q.fillStyle=i%2?'rgba(30,31,21,.09)':'rgba(239,216,159,.09)';
-      q.fillRect(random()*512,random()*320,range(1,6),range(1,5));
+  for (let i = 0; i < 7; i++) {
+    const x = -12 + i * 4;
+    const h = range(14, 23);
+
+    cube(3.5, h, 4, x, h / 2, -18, i % 2 ? greenWall : plaster);
+
+    for (let y = 7; y < h - 1; y += 2.5) {
+      cube(.65, .95, .05, x - .75, y, -15.96, dark);
+      cube(
+        .65, .95, .05, x + .75, y, -15.96,
+        i % 3 === 0 ? teal : dark
+      );
     }
-    const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;
+  }
+
+  // ============================================================
+  // Signs and posters
+  // ============================================================
+  function poster(
+    text, sub, color = '#c7b485', lit = false
+  ) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 320;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = lit ? '#173830' : color;
+    ctx.fillRect(0, 0, 512, 320);
+    ctx.strokeStyle = lit ? '#9fddbc' : '#514c39';
+    ctx.lineWidth = 9;
+    ctx.strokeRect(13, 13, 486, 294);
+
+    ctx.fillStyle = lit ? '#b4e9cb' : '#423e30';
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 57px sans-serif';
+    ctx.fillText(text, 256, 145);
+
+    ctx.font = '21px monospace';
+    ctx.fillText(sub, 256, 207);
+
+    for (let i = 0; i < 1800; i++) {
+      ctx.fillStyle = i % 2
+        ? 'rgba(30,31,21,.09)'
+        : 'rgba(239,216,159,.09)';
+
+      ctx.fillRect(
+        random() * 512, random() * 320,
+        range(1, 6), range(1, 5)
+      );
+    }
+
+    const texture = new T.CanvasTexture(canvas);
+    texture.colorSpace = T.SRGBColorSpace;
+
     return new T.MeshStandardMaterial({
-      map:tex,roughness:.9,side:T.DoubleSide,
-      emissive:lit?'#b7e8c9':'#000000',
-      emissiveMap:lit?tex:null,emissiveIntensity:lit?1.3:0
+      map: texture,
+      roughness: .9,
+      side: T.DoubleSide,
+      emissive: lit ? '#b7e8c9' : '#000000',
+      emissiveMap: lit ? texture : null,
+      emissiveIntensity: lit ? 1.3 : 0
     });
   }
 
-  function panel(w,h,x,y,z,mat,angle=0) {
-    const p=new T.Mesh(new T.PlaneGeometry(w,h),mat);
-    p.position.set(x,y,z);p.rotation.y=angle;
-    scene.add(p);return p;
+  function panel(w, h, x, y, z, mat, angle = 0) {
+    const mesh = new T.Mesh(new T.PlaneGeometry(w, h), mat);
+    mesh.position.set(x, y, z);
+    mesh.rotation.y = angle;
+    scene.add(mesh);
+    return mesh;
   }
 
-  panel(2.7,1.1,-5.55,3.25,-6.4,poster('REPAIR','MALI / SINCE 2081'),Math.PI/2);
-  panel(1.45,1.0,5.55,3.2,-2.5,poster('NIGHT','TEA & PARTS','#91aa88',true),-Math.PI/2);
-  panel(2.8,1.3,0,4.6,-13.93,poster('DISTRICT 07','PLEASE KEEP THE LIGHT ON'));
-  for(let i=0;i<13;i++) {
-    const side=i%2?-1:1;
-    const z=range(-12,12);
-    panel(.45,.65,side*5.54,range(.9,2),z,
-      poster(i%3?'07':'LOST',i%3?'SERVICE':'ONE RED SOCK',
-        i%2?'#b49e77':'#8e9a7b'),-side*Math.PI/2);
-  }
+  panel(
+    2.7, 1.1, -5.55, 3.25, -6.4,
+    poster('REPAIR', 'MALI / SINCE 2081'),
+    Math.PI / 2
+  );
 
-  // ------------------------------------------------------------
-  // Climbing route: crates -> balcony -> footbridge -> rooftop
-  // ------------------------------------------------------------
-  function crate(x,z,w,h,d) {
-    cube(w,h,d,x,h/2,z,wood,true);
-    for(const y of [.1,h-.1])
-      cube(w+.02,.075,d+.02,x,y,z,rust);
-    for(const offset of [-.32,.32])
-      cube(.06,h,d+.035,x+w*offset,h/2,z,rust);
-  }
-  crate(3.9,8.1,1.45,.55,1.6);
-  crate(4.0,6.55,1.55,1.25,1.45);
-  crate(4.1,5.0,1.65,1.95,1.5);
+  panel(
+    1.45, 1, 5.55, 3.2, -2.5,
+    poster('NIGHT', 'TEA & PARTS', '#91aa88', true),
+    -Math.PI / 2
+  );
 
-  // Thin slabs allow the cat to walk underneath.
-  cube(3.4,.18,5.0,4.25,2.56,1.7,rust,true);
-  cube(3.4,.18,9.5,-4.25,2.56,-3.5,rust,true);
-  cube(5.1,.16,1.15,0,2.57,-.5,wood,true);
+  panel(
+    2.8, 1.3, 0, 4.6, -13.93,
+    poster('DISTRICT 07', 'PLEASE KEEP THE LIGHT ON')
+  );
 
-  for(let x=-2.4;x<2.5;x+=.24)
-    cube(.025,.022,1.15,x,2.664,-.5,dark);
+  for (let i = 0; i < 13; i++) {
+    const side = i % 2 ? -1 : 1;
+    const z = range(-12, 12);
 
-  // Back rails; bridge intentionally has open sides.
-  for(const side of [-1,1]) {
-    rod(V(side*5.7,2.66,-2),V(side*5.7,3.45,-2),.035,steel);
-    rod(V(side*5.7,2.66,3.3),V(side*5.7,3.45,3.3),.035,steel);
-    rod(V(side*5.7,3.45,-2),V(side*5.7,3.45,3.3),.035,steel);
-  }
-
-  // Workshop supports, roof edge, hanging apron.
-  for(const z of [-7.8,-3.8]) {
-    rod(V(-2.8,0,z),V(-2.8,2.48,z),.065,rust);
-  }
-  cube(.1,.28,4.5,-2.55,2.46,-5.9,wood);
-
-  // ------------------------------------------------------------
-  // Props: pots, rubble, bags, cloth, shop shelves
-  // ------------------------------------------------------------
-  function plant(x,y,z,size=1) {
-    rod(V(x,y,z),V(x,y+.28*size,z),.18*size,terra);
-    sphere(x,y+.27*size,z,.18*size,.035*size,.18*size,dark);
-    for(let i=0;i<8;i++) {
-      const a=i/8*Math.PI*2;
-      const tip=V(
-        x+Math.cos(a)*.3*size,
-        y+range(.55,.9)*size,
-        z+Math.sin(a)*.3*size
-      );
-      rod(V(x,y+.23*size,z),tip,.009*size,leafMat);
-      const leaf=sphere(tip.x,tip.y,tip.z,.10*size,.22*size,.045*size,
-        i%2?leafMat:leafLight);
-      leaf.rotation.z=Math.cos(a)*.7;leaf.rotation.y=a;
-    }
-  }
-  plant(-3.1,0,-8.9,1.3);
-  plant(-5,2.66,-1.2,1);
-  plant(5.1,2.66,2.5,.85);
-  plant(-4.9,0,10,1);
-  plant(4.9,0,-10,1.4);
-
-  const debrisMats=[rust,wood,plaster,dark];
-  for(let i=0;i<100;i++) {
-    const side=i%2?-1:1;
-    const obj=cube(
-      range(.04,.22),range(.03,.13),range(.06,.3),
-      side*range(4.8,5.5),.06,range(-13,13),debrisMats[i%4]
+    panel(
+      .45, .65, side * 5.54, range(.9, 2), z,
+      poster(
+        i % 3 ? '07' : 'LOST',
+        i % 3 ? 'SERVICE' : 'ONE RED SOCK',
+        i % 2 ? '#b49e77' : '#8e9a7b'
+      ),
+      -side * Math.PI / 2
     );
-    obj.rotation.set(range(-.2,.2),range(0,6),range(-.15,.15));
-  }
-  for(const [x,z] of [[-4.8,9],[4.9,-9],[-5,2],[5.0,10]]) {
-    sphere(x,.27,z,.34,.31,.3,black);
-    sphere(x,.54,z,.07,.08,.07,black);
   }
 
-  // Cloth geometry has folds, rather than a flat rectangle.
-  function cloth(x,y,z,w,h,mat,angle=0) {
-    const geometry=new T.PlaneGeometry(w,h,12,16);
-    const p=geometry.attributes.position;
-    for(let i=0;i<p.count;i++) {
-      const u=p.getX(i),v=p.getY(i);
-      p.setZ(i,Math.sin(u*23)*.025+Math.sin(v*5+u*3)*.035);
+  // ============================================================
+  // Climbing route
+  // ============================================================
+  function crate(x, z, w, h, d) {
+    cube(w, h, d, x, h / 2, z, wood, true);
+
+    for (const y of [.1, h - .1]) {
+      cube(w + .02, .075, d + .02, x, y, z, rust);
     }
+
+    for (const offset of [-.32, .32]) {
+      cube(
+        .06, h, d + .035,
+        x + w * offset, h / 2, z, rust
+      );
+    }
+  }
+
+  crate(3.9, 8.1, 1.45, .55, 1.6);
+  crate(4, 6.55, 1.55, 1.25, 1.45);
+  crate(4.1, 5, 1.65, 1.95, 1.5);
+
+  cube(3.4, .18, 5, 4.25, 2.56, 1.7, rust, true);
+  cube(3.4, .18, 9.5, -4.25, 2.56, -3.5, rust, true);
+  cube(5.1, .16, 1.15, 0, 2.57, -.5, wood, true);
+
+  for (let x = -2.4; x < 2.5; x += .24) {
+    cube(.025, .022, 1.15, x, 2.664, -.5, dark);
+  }
+
+  for (const side of [-1, 1]) {
+    rod(
+      V(side * 5.7, 2.66, -2),
+      V(side * 5.7, 3.45, -2),
+      .035, steel
+    );
+    rod(
+      V(side * 5.7, 2.66, 3.3),
+      V(side * 5.7, 3.45, 3.3),
+      .035, steel
+    );
+    rod(
+      V(side * 5.7, 3.45, -2),
+      V(side * 5.7, 3.45, 3.3),
+      .035, steel
+    );
+  }
+
+  for (const z of [-7.8, -3.8]) {
+    rod(V(-2.8, 0, z), V(-2.8, 2.48, z), .065, rust);
+  }
+
+  cube(.1, .28, 4.5, -2.55, 2.46, -5.9, wood);
+
+  // ============================================================
+  // Plants and street props
+  // ============================================================
+  function plant(x, y, z, size = 1) {
+    rod(
+      V(x, y, z), V(x, y + .28 * size, z),
+      .18 * size, terra
+    );
+
+    sphere(
+      x, y + .27 * size, z,
+      .18 * size, .035 * size, .18 * size, dark
+    );
+
+    for (let i = 0; i < 8; i++) {
+      const angle = i / 8 * Math.PI * 2;
+      const tip = V(
+        x + Math.cos(angle) * .3 * size,
+        y + range(.55, .9) * size,
+        z + Math.sin(angle) * .3 * size
+      );
+
+      rod(
+        V(x, y + .23 * size, z),
+        tip, .009 * size, leafMat
+      );
+
+      const leaf = sphere(
+        tip.x, tip.y, tip.z,
+        .10 * size, .22 * size, .045 * size,
+        i % 2 ? leafMat : leafLight
+      );
+
+      leaf.rotation.z = Math.cos(angle) * .7;
+      leaf.rotation.y = angle;
+    }
+  }
+
+  plant(-3.1, 0, -8.9, 1.3);
+  plant(-5, 2.66, -1.2, 1);
+  plant(5.1, 2.66, 2.5, .85);
+  plant(-4.9, 0, 10, 1);
+  plant(4.9, 0, -10, 1.4);
+
+  const debrisMats = [rust, wood, plaster, dark];
+
+  for (let i = 0; i < 100; i++) {
+    const side = i % 2 ? -1 : 1;
+    const obj = cube(
+      range(.04, .22), range(.03, .13), range(.06, .3),
+      side * range(4.8, 5.5), .06, range(-13, 13),
+      debrisMats[i % 4]
+    );
+
+    obj.rotation.set(
+      range(-.2, .2),
+      range(0, 6),
+      range(-.15, .15)
+    );
+  }
+
+  for (const [x, z] of [
+    [-4.8, 9], [4.9, -9], [-5, 2], [5, 10]
+  ]) {
+    sphere(x, .27, z, .34, .31, .3, black);
+    sphere(x, .54, z, .07, .08, .07, black);
+  }
+
+  function cloth(x, y, z, w, h, mat, angle = 0) {
+    const geometry = new T.PlaneGeometry(w, h, 12, 16);
+    const positions = geometry.attributes.position;
+
+    for (let i = 0; i < positions.count; i++) {
+      const u = positions.getX(i);
+      const v = positions.getY(i);
+
+      positions.setZ(
+        i,
+        Math.sin(u * 23) * .025 +
+        Math.sin(v * 5 + u * 3) * .035
+      );
+    }
+
     geometry.computeVertexNormals();
-    const m=mat.clone();m.side=T.DoubleSide;
-    const mesh=new T.Mesh(geometry,m);
-    mesh.position.set(x,y,z);mesh.rotation.y=angle;
-    mesh.castShadow=true;mesh.receiveShadow=true;
-    scene.add(mesh);return mesh;
+
+    const clothMat = mat.clone();
+    clothMat.side = T.DoubleSide;
+
+    const mesh = new T.Mesh(geometry, clothMat);
+    mesh.position.set(x, y, z);
+    mesh.rotation.y = angle;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    return mesh;
   }
 
-  for(const z of [-9,-3,4,10]) {
-    wire([V(-5.8,6.8,z),V(0,5.7,z+.3),V(5.8,6.6,z)],.023);
-  }
-  wire([V(-5.8,5,-4),V(0,4.5,-3.6),V(5.8,5.2,-4)],.014);
-  for(let i=0;i<7;i++) {
-    cloth(-2.7+i*.8,4.14,-3.85,range(.4,.65),range(.65,.95),
-      i%3===0?rugMat:material(i%2?'#888775':'#595d4b'));
-    cube(.025,.065,.035,-2.7+i*.8,4.58,-3.85,wood);
+  for (const z of [-9, -3, 4, 10]) {
+    wire([
+      V(-5.8, 6.8, z),
+      V(0, 5.7, z + .3),
+      V(5.8, 6.6, z)
+    ], .023);
   }
 
-  // Shop carpet.
-  const carpet=new T.Mesh(new T.PlaneGeometry(2.9,3.5),rugMat);
-  carpet.rotation.x=-Math.PI/2;carpet.position.set(-4.1,.02,-6.0);
-  carpet.receiveShadow=true;scene.add(carpet);
+  wire([
+    V(-5.8, 5, -4),
+    V(0, 4.5, -3.6),
+    V(5.8, 5.2, -4)
+  ], .014);
 
-  // Shelf at the rear of the repair nook.
-  for(let y=.3;y<2.3;y+=.58) {
-    cube(.7,.09,2.7,-5.53,y,-6.0,wood);
-    for(let j=0;j<4;j++) {
-      const zz=-7.05+j*.62;
-      cube(.34,.26,.36,-5.46,y+.18,zz,j%2?rust:steel);
-      cube(.025,.12,.22,-5.27,y+.2,zz,dark);
+  for (let i = 0; i < 7; i++) {
+    cloth(
+      -2.7 + i * .8, 4.14, -3.85,
+      range(.4, .65), range(.65, .95),
+      i % 3 === 0
+        ? rugMat
+        : material(i % 2 ? '#888775' : '#595d4b')
+    );
+
+    cube(
+      .025, .065, .035,
+      -2.7 + i * .8, 4.58, -3.85, wood
+    );
+  }
+
+  const carpet = new T.Mesh(
+    new T.PlaneGeometry(2.9, 3.5), rugMat
+  );
+  carpet.rotation.x = -Math.PI / 2;
+  carpet.position.set(-4.1, .02, -6);
+  carpet.receiveShadow = true;
+  scene.add(carpet);
+
+  for (let y = .3; y < 2.3; y += .58) {
+    cube(.7, .09, 2.7, -5.53, y, -6, wood);
+
+    for (let j = 0; j < 4; j++) {
+      const z = -7.05 + j * .62;
+      cube(
+        .34, .26, .36, -5.46, y + .18, z,
+        j % 2 ? rust : steel
+      );
+      cube(.025, .12, .22, -5.27, y + .2, z, dark);
     }
   }
-  cube(.10,2.4,.1,-5.78,1.2,-7.4,rust);
-  cube(.10,2.4,.1,-5.78,1.2,-4.6,rust);
 
-  // Small radio table at the entrance.
-  cube(1.25,.1,.75,-4.35,.69,6.15,wood,true);
-  for(const x of [-4.8,-3.9])for(const z of [5.9,6.4])
-    cube(.06,.66,.06,x,.33,z,rust);
-  cube(.66,.34,.3,-4.35,.91,6.15,rust);
-  cube(.50,.22,.022,-4.35,.92,6.315,dark);
-  for(let i=0;i<9;i++)cube(.018,.16,.028,-4.55+i*.035,.92,6.33,steel);
-  sphere(-4.12,.93,6.34,.055,.055,.025,warm);
-  rod(V(-4.5,1.08,6.15),V(-4.4,1.57,6.15),.009,steel);
+  cube(.10, 2.4, .1, -5.78, 1.2, -7.4, rust);
+  cube(.10, 2.4, .1, -5.78, 1.2, -4.6, rust);
 
-  // Roof stool and an empty tea cup.
-  cube(.65,.08,.65,-4.8,3.05,-.45,wood);
-  for(const x of [-5,-4.6])for(const z of [-.65,-.25])
-    cube(.045,.36,.045,x,2.85,z,steel);
-  rod(V(-4.8,3.09,-.45),V(-4.8,3.23,-.45),.08,terra);
+  // Radio table.
+  cube(1.25, .1, .75, -4.35, .69, 6.15, wood, true);
 
-  // ------------------------------------------------------------
-  // Closed drainage arch at the end of the playable alley
-  // ------------------------------------------------------------
-  const arch=new T.Mesh(new T.TorusGeometry(2.25,.3,10,40,Math.PI),rust);
-  arch.position.set(0,1.35,-13.62);
-  arch.castShadow=true;arch.receiveShadow=true;scene.add(arch);
-  cube(.56,1.36,.6,-2.25,.68,-13.62,rust,true);
-  cube(.56,1.36,.6,2.25,.68,-13.62,rust,true);
-  cube(3.95,3.25,.04,0,1.62,-13.96,dark);
-  for(let x=-1.8;x<2;x+=.27)
-    rod(V(x,0,-13.78),V(x,3.15,-13.78),.025,steel);
-  cube(3.8,.045,.05,0,1.6,-13.73,steel);
-  panel(1.35,.55,0,2.5,-13.69,poster('CLOSED','WATERWAY / 07'));
-
-  // ------------------------------------------------------------
-  // Practical lights
-  // ------------------------------------------------------------
-  wallLamp(-4.8,2.6,6.2);
-  wallLamp(-4.2,2.27,-6.3);
-  wallLamp(4.7,3.7,7.0);
-  light(4.7,3.0,-2.5,'#81d4b4',35,10);
-  light(0,3.3,-12.7,'#cba05e',27,8);
-  cube(.055,2.0,.06,1.65,2.3,-13.64,teal);
-
-  const shopLight=new T.SpotLight('#ffd29a',45,7,.85,.65,2);
-  shopLight.position.set(-3.5,2.4,-6.4);
-  shopLight.target.position.set(-4.1,.2,-6);
-  scene.add(shopLight,shopLight.target);
-
-  // Dust motes, not heavy rain: quiet air under awnings.
-  const dustCount=180,dustData=new Float32Array(dustCount*3);
-  for(let i=0;i<dustCount;i++) {
-    dustData[i*3]=range(-5.5,5.5);
-    dustData[i*3+1]=range(.3,7);
-    dustData[i*3+2]=range(-13,13);
+  for (const x of [-4.8, -3.9]) {
+    for (const z of [5.9, 6.4]) {
+      cube(.06, .66, .06, x, .33, z, rust);
+    }
   }
-  const dustGeo=new T.BufferGeometry();
-  dustGeo.setAttribute('position',new T.BufferAttribute(dustData,3));
-  scene.add(new T.Points(dustGeo,new T.PointsMaterial({
-    color:'#d8c59a',size:.019,transparent:true,opacity:.3,depthWrite:false
-  })));
 
-  // ------------------------------------------------------------
-  // Original robot character: Mali, the repair keeper
-  // ------------------------------------------------------------
-  const robot=new T.Group();
-  robot.position.set(-4.3,0,-6.35);
-  robot.rotation.y=.5;scene.add(robot);
+  cube(.66, .34, .3, -4.35, .91, 6.15, rust);
+  cube(.50, .22, .022, -4.35, .92, 6.315, dark);
 
-  // Chair.
-  cube(.73,.10,.68,0,.57,0,wood,false,robot);
-  cube(.74,.55,.09,0,1.02,-.3,wood,false,robot);
-  for(const x of [-.28,.28])for(const z of [-.25,.25])
-    rod(V(x,.04,z),V(x,.57,z),.035,steel,robot);
+  for (let i = 0; i < 9; i++) {
+    cube(
+      .018, .16, .028,
+      -4.55 + i * .035, .92, 6.33, steel
+    );
+  }
 
-  const coat=textured(fabricTexture(),'#73816a',1);
-  sphere(0,1.02,0,.30,.42,.23,coat,robot);
-  cube(.43,.44,.05,0,.94,.24,coat,false,robot);
-  rod(V(-.17,.57,.17),V(-.18,.27,.36),.075,rust,robot);
-  rod(V(.17,.57,.17),V(.19,.27,.36),.075,rust,robot);
-  rod(V(-.18,.27,.36),V(-.18,.09,.48),.065,steel,robot);
-  rod(V(.19,.27,.36),V(.19,.09,.48),.065,steel,robot);
-  cube(.2,.12,.32,-.18,.07,.5,dark,false,robot);
-  cube(.2,.12,.32,.19,.07,.5,dark,false,robot);
+  sphere(-4.12, .93, 6.34, .055, .055, .025, warm);
+  rod(V(-4.5, 1.08, 6.15), V(-4.4, 1.57, 6.15), .009, steel);
 
-  const robotHead=new T.Group();
-  robotHead.position.set(0,1.49,0);robot.add(robotHead);
-  cube(.54,.4,.37,0,0,0,rust,false,robotHead);
-  cube(.43,.27,.02,0,0,.195,dark,false,robotHead);
-  for(const x of [-.105,.105])
-    cube(.068,.047,.023,x,.027,.211,teal,false,robotHead);
-  cube(.11,.018,.023,0,-.07,.211,teal,false,robotHead);
-  rod(V(.23,.17,0),V(.3,.34,0),.012,steel,robotHead);
+  // Roof stool and cup.
+  cube(.65, .08, .65, -4.8, 3.05, -.45, wood);
 
-  const robotArm=new T.Group();
-  robotArm.position.set(.3,1.24,0);robot.add(robotArm);
-  rod(V(),V(.12,-.29,.14),.063,steel,robotArm);
-  rod(V(.12,-.29,.14),V(.01,-.40,.32),.055,steel,robotArm);
-  sphere(.01,-.4,.32,.075,.06,.08,rust,robotArm);
-  rod(V(-.3,1.23,0),V(-.36,.93,.22),.063,steel,robot);
-  rod(V(-.36,.93,.22),V(-.1,.8,.35),.055,steel,robot);
-  sphere(-.1,.8,.35,.075,.06,.08,rust,robot);
+  for (const x of [-5, -4.6]) {
+    for (const z of [-.65, -.25]) {
+      cube(.045, .36, .045, x, 2.85, z, steel);
+    }
+  }
 
-  // Small device resting on Mali's lap.
-  cube(.35,.08,.23,0,.77,.35,wood,false,robot);
-  cube(.13,.012,.1,0,.816,.35,teal,false,robot);
+  rod(
+    V(-4.8, 3.09, -.45),
+    V(-4.8, 3.23, -.45),
+    .08, terra
+  );
+
+  // ============================================================
+  // Closed drainage arch
+  // ============================================================
+  const arch = new T.Mesh(
+    new T.TorusGeometry(2.25, .3, 10, 40, Math.PI),
+    rust
+  );
+  arch.position.set(0, 1.35, -13.62);
+  arch.castShadow = true;
+  arch.receiveShadow = true;
+  scene.add(arch);
+
+  cube(.56, 1.36, .6, -2.25, .68, -13.62, rust, true);
+  cube(.56, 1.36, .6, 2.25, .68, -13.62, rust, true);
+  cube(3.95, 3.25, .04, 0, 1.62, -13.96, dark);
+
+  for (let x = -1.8; x < 2; x += .27) {
+    rod(V(x, 0, -13.78), V(x, 3.15, -13.78), .025, steel);
+  }
+
+  cube(3.8, .045, .05, 0, 1.6, -13.73, steel);
+
+  panel(
+    1.35, .55, 0, 2.5, -13.69,
+    poster('CLOSED', 'WATERWAY / 07')
+  );
+
+  // ============================================================
+  // Practical lights
+  // ============================================================
+  wallLamp(-4.8, 2.6, 6.2);
+  wallLamp(-4.2, 2.27, -6.3);
+  wallLamp(4.7, 3.7, 7);
+
+  light(4.7, 3, -2.5, '#81d4b4', 35, 10);
+  light(0, 3.3, -12.7, '#cba05e', 27, 8);
+
+  cube(.055, 2, .06, 1.65, 2.3, -13.64, teal);
+
+  const shopLight = new T.SpotLight(
+    '#ffd29a', 45, 7, .85, .65, 2
+  );
+  shopLight.position.set(-3.5, 2.4, -6.4);
+  shopLight.target.position.set(-4.1, .2, -6);
+  scene.add(shopLight, shopLight.target);
+
+  // Dust motes.
+  const dustCount = 180;
+  const dustData = new Float32Array(dustCount * 3);
+
+  for (let i = 0; i < dustCount; i++) {
+    dustData[i * 3] = range(-5.5, 5.5);
+    dustData[i * 3 + 1] = range(.3, 7);
+    dustData[i * 3 + 2] = range(-13, 13);
+  }
+
+  const dustGeo = new T.BufferGeometry();
+  dustGeo.setAttribute(
+    'position', new T.BufferAttribute(dustData, 3)
+  );
+
+  scene.add(new T.Points(
+    dustGeo,
+    new T.PointsMaterial({
+      color: '#d8c59a',
+      size: .019,
+      transparent: true,
+      opacity: .3,
+      depthWrite: false
+    })
+  ));
+
+  // ============================================================
+  // Mali, the repair keeper
+  // ============================================================
+  const robot = new T.Group();
+  robot.position.set(-4.3, 0, -6.35);
+  robot.rotation.y = .5;
+  scene.add(robot);
+
+  cube(.73, .10, .68, 0, .57, 0, wood, false, robot);
+  cube(.74, .55, .09, 0, 1.02, -.3, wood, false, robot);
+
+  for (const x of [-.28, .28]) {
+    for (const z of [-.25, .25]) {
+      rod(V(x, .04, z), V(x, .57, z), .035, steel, robot);
+    }
+  }
+
+  const coat = textured(fabricTexture(), '#73816a', 1);
+  sphere(0, 1.02, 0, .30, .42, .23, coat, robot);
+  cube(.43, .44, .05, 0, .94, .24, coat, false, robot);
+
+  rod(
+    V(-.17, .57, .17), V(-.18, .27, .36),
+    .075, rust, robot
+  );
+  rod(
+    V(.17, .57, .17), V(.19, .27, .36),
+    .075, rust, robot
+  );
+  rod(
+    V(-.18, .27, .36), V(-.18, .09, .48),
+    .065, steel, robot
+  );
+  rod(
+    V(.19, .27, .36), V(.19, .09, .48),
+    .065, steel, robot
+  );
+
+  cube(.2, .12, .32, -.18, .07, .5, dark, false, robot);
+  cube(.2, .12, .32, .19, .07, .5, dark, false, robot);
+
+  const robotHead = new T.Group();
+  robotHead.position.set(0, 1.49, 0);
+  robot.add(robotHead);
+
+  cube(.54, .4, .37, 0, 0, 0, rust, false, robotHead);
+  cube(.43, .27, .02, 0, 0, .195, dark, false, robotHead);
+
+  for (const x of [-.105, .105]) {
+    cube(
+      .068, .047, .023,
+      x, .027, .211, teal, false, robotHead
+    );
+  }
+
+  cube(.11, .018, .023, 0, -.07, .211, teal, false, robotHead);
+
+  rod(
+    V(.23, .17, 0), V(.3, .34, 0),
+    .012, steel, robotHead
+  );
+
+  const robotArm = new T.Group();
+  robotArm.position.set(.3, 1.24, 0);
+  robot.add(robotArm);
+
+  rod(V(), V(.12, -.29, .14), .063, steel, robotArm);
+  rod(
+    V(.12, -.29, .14), V(.01, -.40, .32),
+    .055, steel, robotArm
+  );
+  sphere(.01, -.4, .32, .075, .06, .08, rust, robotArm);
+
+  rod(
+    V(-.3, 1.23, 0), V(-.36, .93, .22),
+    .063, steel, robot
+  );
+  rod(
+    V(-.36, .93, .22), V(-.1, .8, .35),
+    .055, steel, robot
+  );
+  sphere(-.1, .8, .35, .075, .06, .08, rust, robot);
+
+  cube(.35, .08, .23, 0, .77, .35, wood, false, robot);
+  cube(.13, .012, .1, 0, .816, .35, teal, false, robot);
 
   solids.push({
-    minX:-4.8,maxX:-3.85,minZ:-6.85,maxZ:-5.9,bottom:0,top:1.75,
-    box:new T.Box3(V(-4.8,0,-6.85),V(-3.85,1.75,-5.9))
+    minX: -4.8,
+    maxX: -3.85,
+    minZ: -6.85,
+    maxZ: -5.9,
+    bottom: 0,
+    top: 1.75,
+    box: new T.Box3(
+      V(-4.8, 0, -6.85),
+      V(-3.85, 1.75, -5.9)
+    )
   });
 
-  // ------------------------------------------------------------
-  // Calico cat
-  // ------------------------------------------------------------
-  const cat=new T.Group();scene.add(cat);
-  cat.position.set(0,0,10.5);
+  // ============================================================
+  // New calico cat
+  // Front direction: -Z
+  // All textures are generated locally.
+  // ============================================================
+  function createReferenceCat() {
+    const cat = new T.Group();
+    cat.position.set(0, 0, 10.5);
+    scene.add(cat);
 
-  const fur=textured(calicoTexture(),'#ffffff',1);
-  fur.bumpScale=.003;
-  const cream=material('#e5dcc3',1);
-  const orange=material('#b87a45',1);
-  const charcoal=material('#353834',1);
-  const pink=material('#b47b73',1);
-  const eye=material('#9eae69',.24);
-  const catBody=new T.Group();cat.add(catBody);
+    const catBody = new T.Group();
+    cat.add(catBody);
 
-  sphere(0,.58,.02,.255,.28,.49,fur,catBody);
-  sphere(0,.6,-.29,.225,.28,.24,cream,catBody);
-  sphere(0,.56,.32,.26,.28,.25,fur,catBody);
+    // Independent random generator for fur.
+    let furSeed = 78231;
 
-  const head=new T.Group();
-  head.position.set(0,.84,-.47);catBody.add(head);
-  sphere(0,0,0,.255,.23,.225,fur,head);
-  sphere(-.074,-.09,-.19,.095,.07,.071,cream,head);
-  sphere(.074,-.09,-.19,.095,.07,.071,cream,head);
-  sphere(0,-.058,-.255,.035,.025,.026,pink,head);
+    function rnd() {
+      furSeed = (
+        Math.imul(furSeed, 1664525) + 1013904223
+      ) >>> 0;
+      return furSeed / 4294967296;
+    }
 
-  for(const side of [-1,1]) {
-    const ear=new T.Mesh(new T.ConeGeometry(.125,.27,3),
-      side<0?orange:charcoal);
-    ear.position.set(side*.175,.23,.012);
-    ear.rotation.z=-side*.16;head.add(ear);
-    const inside=new T.Mesh(new T.ConeGeometry(.073,.17,3),pink);
-    inside.position.set(side*.175,.245,-.045);
-    head.add(inside);
-    sphere(side*.113,.025,-.196,.062,.054,.035,eye,head);
-    sphere(side*.113,.025,-.226,.014,.044,.012,black,head);
-    sphere(side*.096,.042,-.237,.013,.013,.006,cream,head);
+    const smoothSphere = new T.SphereGeometry(1, 32, 24);
+
+    function catMaterial(color, roughness = .85, metalness = 0) {
+      return new T.MeshStandardMaterial({
+        color, roughness, metalness
+      });
+    }
+
+    function addMesh(geometry, mat, parent) {
+      const mesh = new T.Mesh(geometry, mat);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      parent.add(mesh);
+      return mesh;
+    }
+
+    function ball(parent, mat, x, y, z, sx, sy, sz) {
+      const mesh = addMesh(smoothSphere, mat, parent);
+      mesh.position.set(x, y, z);
+      mesh.scale.set(sx, sy, sz);
+      return mesh;
+    }
+
+    function tube(parent, points, radius, mat) {
+      return addMesh(
+        new T.TubeGeometry(
+          new T.CatmullRomCurve3(points),
+          16, radius, 8, false
+        ),
+        mat,
+        parent
+      );
+    }
+
+    // Planar UV projection for predictable facial markings.
+    function frontGeometry() {
+      const geometry = smoothSphere.clone();
+      const positions = geometry.attributes.position;
+      const uv = geometry.attributes.uv;
+
+      for (let i = 0; i < positions.count; i++) {
+        uv.setXY(
+          i,
+          (positions.getX(i) + 1) * .5,
+          (positions.getY(i) + 1) * .5
+        );
+      }
+
+      uv.needsUpdate = true;
+      return geometry;
+    }
+
+    function makeTexture(size, draw) {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      draw(canvas.getContext('2d'), size);
+
+      const texture = new T.CanvasTexture(canvas);
+      texture.colorSpace = T.SRGBColorSpace;
+      texture.anisotropy = Math.min(
+        8, renderer.capabilities.getMaxAnisotropy()
+      );
+
+      return texture;
+    }
+
+    function hairGrain(ctx, n, count) {
+      ctx.lineWidth = Math.max(.55, n / 1200);
+
+      for (let i = 0; i < count; i++) {
+        const x = rnd() * n;
+        const y = rnd() * n;
+
+        ctx.strokeStyle = rnd() > .48
+          ? 'rgba(255,241,215,.13)'
+          : 'rgba(30,18,12,.10)';
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(
+          x + (rnd() - .5) * n * .007,
+          y + (2 + rnd() * 5) * n / 512
+        );
+        ctx.stroke();
+      }
+    }
+
+    function plainFur(color) {
+      const texture = makeTexture(256, (ctx, n) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, n, n);
+        hairGrain(ctx, n, 5500);
+      });
+
+      return new T.MeshStandardMaterial({
+        map: texture,
+        roughness: .94
+      });
+    }
+
+    const whiteFur = plainFur('#eee5d5');
+    const orangeFur = plainFur('#bf6c2f');
+    const blackFur = plainFur('#282322');
+
+    // Body: broad irregular orange and black patches.
+    const bodyTexture = makeTexture(512, (ctx, n) => {
+      ctx.fillStyle = '#eee5d5';
+      ctx.fillRect(0, 0, n, n);
+
+      const patches = [
+        [.12, .24, .23, .29, '#282322'],
+        [.37, .34, .20, .30, '#bd692d'],
+        [.68, .24, .22, .26, '#282322'],
+        [.86, .48, .22, .28, '#c67b37'],
+        [.53, .65, .17, .22, '#a95527'],
+        [.18, .77, .18, .15, '#302725']
+      ];
+
+      for (const [cx, cy, rx, ry, color] of patches) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+
+        for (let j = 0; j <= 64; j++) {
+          const angle = j / 64 * Math.PI * 2;
+          const uneven =
+            1 +
+            .09 * Math.sin(angle * 5 + cx * 13) +
+            .045 * Math.cos(angle * 9);
+
+          const x = (cx + Math.cos(angle) * rx * uneven) * n;
+          const y = (cy + Math.sin(angle) * ry * uneven) * n;
+
+          if (j === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      hairGrain(ctx, n, 22000);
+    });
+
+    const bodyFur = new T.MeshStandardMaterial({
+      map: bodyTexture,
+      roughness: .94
+    });
+
+    // Face: asymmetric calico markings and a white central blaze.
+    const faceTexture = makeTexture(1024, (ctx, n) => {
+      ctx.fillStyle = '#272221';
+      ctx.fillRect(0, 0, n, n);
+
+      ctx.fillStyle = '#c87936';
+      ctx.beginPath();
+      ctx.ellipse(
+        n * .24, n * .49,
+        n * .32, n * .39,
+        -.25, 0, Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.fillStyle = '#ad592a';
+      ctx.beginPath();
+      ctx.ellipse(
+        n * .66, n * .22,
+        n * .19, n * .29,
+        -.35, 0, Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.fillStyle = '#302522';
+      ctx.beginPath();
+      ctx.ellipse(
+        n * .055, n * .19,
+        n * .18, n * .29,
+        -.25, 0, Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.fillStyle = '#eee5d5';
+      ctx.beginPath();
+      ctx.moveTo(n * .49, n * .11);
+
+      ctx.bezierCurveTo(
+        n * .44, n * .24,
+        n * .47, n * .35,
+        n * .40, n * .49
+      );
+      ctx.bezierCurveTo(
+        n * .36, n * .59,
+        n * .23, n * .61,
+        n * .10, n * .73
+      );
+
+      ctx.lineTo(0, n);
+      ctx.lineTo(n, n);
+      ctx.lineTo(n * .94, n * .72);
+
+      ctx.bezierCurveTo(
+        n * .76, n * .62,
+        n * .61, n * .57,
+        n * .57, n * .43
+      );
+      ctx.bezierCurveTo(
+        n * .55, n * .30,
+        n * .54, n * .19,
+        n * .49, n * .11
+      );
+
+      ctx.closePath();
+      ctx.fill();
+
+      hairGrain(ctx, n, 35000);
+    });
+
+    const faceFur = new T.MeshStandardMaterial({
+      map: faceTexture,
+      roughness: .94
+    });
+
+    const innerEarMat = catMaterial('#ae7770', .95);
+    const nosePink = catMaterial('#bd777b', .56);
+    const noseDark = catMaterial('#653c40', .85);
+    const eyeRim = catMaterial('#30271e', .75);
+    const pupilMat = catMaterial('#080c09', .13);
+    const mouthMat = catMaterial('#715b52', .95);
+    const harnessMat = catMaterial('#252b2b', .93);
+    const trimMat = catMaterial('#645648', .83);
+    const metalMat = catMaterial('#a48657', .38, .7);
+
+    // ----------------------------------------------------------
+    // Torso and chest
+    // ----------------------------------------------------------
+    ball(catBody, bodyFur, 0, .57, .055, .245, .25, .45);
+    ball(catBody, bodyFur, 0, .55, .32, .255, .25, .245);
+
+    const chest = ball(
+      catBody, whiteFur,
+      0, .62, -.265, .214, .277, .215
+    );
+    chest.rotation.x = -.12;
+
+    ball(
+      catBody, whiteFur,
+      0, .43, -.10, .185, .135, .31
+    );
+
+    // ----------------------------------------------------------
+    // Head and muzzle
+    // ----------------------------------------------------------
+    const head = new T.Group();
+    head.position.set(0, .79, -.465);
+    catBody.add(head);
+
+    const skull = addMesh(frontGeometry(), faceFur, head);
+    skull.scale.set(.267, .237, .225);
+
+    ball(
+      head, whiteFur,
+      -.113, -.101, -.158, .121, .088, .083
+    );
+    ball(
+      head, whiteFur,
+      .113, -.101, -.158, .121, .088, .083
+    );
+    ball(
+      head, whiteFur,
+      0, -.163, -.16, .119, .056, .082
+    );
+
+    ball(
+      head, whiteFur,
+      -.054, -.085, -.226, .073, .052, .045
+    );
+    ball(
+      head, whiteFur,
+      .054, -.085, -.226, .073, .052, .045
+    );
+
+    const noseShape = new T.Shape();
+    noseShape.moveTo(-.041, .012);
+    noseShape.quadraticCurveTo(0, .025, .041, .012);
+    noseShape.quadraticCurveTo(.034, -.003, .009, -.026);
+    noseShape.quadraticCurveTo(0, -.034, -.009, -.026);
+    noseShape.quadraticCurveTo(-.034, -.003, -.041, .012);
+
+    const noseGeometry = new T.ExtrudeGeometry(noseShape, {
+      depth: .012,
+      bevelEnabled: true,
+      bevelSegments: 3,
+      steps: 1,
+      bevelSize: .004,
+      bevelThickness: .004,
+      curveSegments: 12
+    });
+
+    const nose = addMesh(noseGeometry, nosePink, head);
+    nose.position.set(0, -.053, -.288);
+
+    for (const side of [-1, 1]) {
+      ball(
+        head, noseDark,
+        side * .022, -.056, -.293,
+        .009, .004, .003
+      );
+    }
+
+    tube(head, [
+      V(0, -.079, -.276),
+      V(0, -.102, -.271),
+      V(0, -.112, -.264)
+    ], .0025, mouthMat);
+
+    for (const side of [-1, 1]) {
+      tube(head, [
+        V(0, -.111, -.264),
+        V(side * .028, -.122, -.263),
+        V(side * .054, -.113, -.260)
+      ], .002, mouthMat);
+    }
+
+    // ----------------------------------------------------------
+    // Shaped ears with pink interiors
+    // ----------------------------------------------------------
+    const ears = [];
+
+    for (const side of [-1, 1]) {
+      const ear = new T.Group();
+      ear.position.set(side * .153, .135, .005);
+      ear.rotation.z = -side * .16;
+      ear.userData.baseZ = ear.rotation.z;
+      head.add(ear);
+      ears.push(ear);
+
+      const outline = new T.Shape();
+      outline.moveTo(-.092, -.032);
+      outline.quadraticCurveTo(-.105, .090, -.031, .246);
+      outline.quadraticCurveTo(0, .278, .031, .246);
+      outline.quadraticCurveTo(.105, .090, .092, -.032);
+      outline.quadraticCurveTo(0, -.064, -.092, -.032);
+
+      const outer = addMesh(
+        new T.ExtrudeGeometry(outline, {
+          depth: .045,
+          bevelEnabled: true,
+          bevelSegments: 3,
+          steps: 1,
+          bevelSize: .009,
+          bevelThickness: .008,
+          curveSegments: 16
+        }),
+        side < 0 ? blackFur : orangeFur,
+        ear
+      );
+      outer.position.z = -.014;
+
+      const inset = new T.Shape();
+      inset.moveTo(-.064, -.004);
+      inset.quadraticCurveTo(-.072, .091, -.012, .212);
+      inset.quadraticCurveTo(0, .230, .012, .212);
+      inset.quadraticCurveTo(.072, .091, .064, -.004);
+      inset.quadraticCurveTo(0, -.025, -.064, -.004);
+
+      const lining = innerEarMat.clone();
+      lining.side = T.DoubleSide;
+
+      const inner = addMesh(
+        new T.ShapeGeometry(inset, 16),
+        lining,
+        ear
+      );
+      inner.position.z = -.027;
+      inner.castShadow = false;
+
+      ball(
+        ear, whiteFur,
+        0, -.008, -.035,
+        .056, .025, .013
+      );
+    }
+
+    // ----------------------------------------------------------
+    // Green eyes with amber centers and broad dark pupils
+    // ----------------------------------------------------------
+    const irisTexture = makeTexture(256, (ctx, n) => {
+      const mid = n / 2;
+
+      const gradient = ctx.createRadialGradient(
+        mid, mid, n * .08,
+        mid, mid, n * .5
+      );
+
+      gradient.addColorStop(0, '#b89b35');
+      gradient.addColorStop(.34, '#a7ac36');
+      gradient.addColorStop(.66, '#708e35');
+      gradient.addColorStop(.88, '#45632c');
+      gradient.addColorStop(1, '#253820');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, n, n);
+
+      for (let i = 0; i < 180; i++) {
+        const angle = i / 180 * Math.PI * 2;
+        const inner = n * (.17 + rnd() * .09);
+        const outer = n * (.40 + rnd() * .08);
+
+        ctx.strokeStyle = i % 2
+          ? 'rgba(219,196,91,.32)'
+          : 'rgba(31,64,27,.35)';
+        ctx.lineWidth = .8;
+
+        ctx.beginPath();
+        ctx.moveTo(
+          mid + Math.cos(angle) * inner,
+          mid + Math.sin(angle) * inner
+        );
+        ctx.lineTo(
+          mid + Math.cos(angle + .012) * outer,
+          mid + Math.sin(angle + .012) * outer
+        );
+        ctx.stroke();
+      }
+    });
+
+    const irisMat = new T.MeshStandardMaterial({
+      map: irisTexture,
+      roughness: .28,
+      metalness: 0
+    });
+
+    const glintMat = new T.MeshBasicMaterial({
+      color: '#fff6df',
+      toneMapped: false
+    });
+
+    for (const side of [-1, 1]) {
+      const eyeGroup = new T.Group();
+      eyeGroup.position.set(side * .119, .020, -.205);
+      eyeGroup.rotation.y = -side * .10;
+      head.add(eyeGroup);
+
+      ball(
+        eyeGroup, eyeRim,
+        0, 0, 0, .085, .080, .043
+      );
+
+      const iris = addMesh(
+        frontGeometry(), irisMat, eyeGroup
+      );
+      iris.position.z = -.030;
+      iris.scale.set(.071, .067, .021);
+
+      ball(
+        eyeGroup, pupilMat,
+        0, .003, -.047, .037, .051, .010
+      );
+
+      ball(
+        eyeGroup, glintMat,
+        -.022, .028, -.057, .012, .011, .003
+      );
+      ball(
+        eyeGroup, glintMat,
+        .016, -.025, -.056, .004, .004, .002
+      );
+
+      eyeGroup.traverse(object => {
+        if (object.isMesh) {
+          object.castShadow = false;
+          object.receiveShadow = false;
+        }
+      });
+    }
+
+    // ----------------------------------------------------------
+    // Whiskers and eyebrow hairs
+    // ----------------------------------------------------------
+    const whiskerMat = new T.LineBasicMaterial({
+      color: '#eadfc9',
+      transparent: true,
+      opacity: .78
+    });
+
+    for (const side of [-1, 1]) {
+      for (let i = 0; i < 4; i++) {
+        const curve = new T.CatmullRomCurve3([
+          V(side * .077, -.079 - i * .010, -.267),
+          V(side * .218, -.056 - i * .026, -.279),
+          V(
+            side * (.335 + i * .012),
+            -.031 - i * .040,
+            -.244
+          )
+        ]);
+
+        head.add(new T.Line(
+          new T.BufferGeometry().setFromPoints(
+            curve.getPoints(16)
+          ),
+          whiskerMat
+        ));
+      }
+
+      for (let i = 0; i < 3; i++) {
+        ball(
+          head, mouthMat,
+          side * (.058 + i * .018),
+          -.083 - (i % 2) * .016,
+          -.270 + i * .004,
+          .0025, .0025, .0015
+        );
+      }
+
+      for (let i = 0; i < 2; i++) {
+        const curve = new T.CatmullRomCurve3([
+          V(side * .11, .116, -.178),
+          V(side * .16, .172 + i * .015, -.185),
+          V(side * .21, .192 + i * .025, -.157)
+        ]);
+
+        head.add(new T.Line(
+          new T.BufferGeometry().setFromPoints(
+            curve.getPoints(10)
+          ),
+          whiskerMat
+        ));
+      }
+    }
+
+    // ----------------------------------------------------------
+    // Legs and paws
+    // Order: left-front, left-rear, right-front, right-rear
+    // ----------------------------------------------------------
+    const legs = [];
+
+    for (const x of [-.163, .163]) {
+      for (const z of [-.29, .30]) {
+        const leg = new T.Group();
+        leg.position.set(x, .45, z);
+        catBody.add(leg);
+
+        const rear = z > 0;
+
+        ball(
+          leg,
+          rear ? bodyFur : (x < 0 ? orangeFur : whiteFur),
+          0, -.102, rear ? .015 : 0,
+          rear ? .096 : .068,
+          .158,
+          rear ? .112 : .078
+        );
+
+        ball(
+          leg, whiteFur,
+          0, -.282, -.008,
+          .053, .120, .061
+        );
+
+        ball(
+          leg, whiteFur,
+          0, -.396, -.047,
+          .075, .054, .107
+        );
+
+        for (const offset of [-.025, .025]) {
+          tube(leg, [
+            V(offset, -.382, -.137),
+            V(offset, -.395, -.151),
+            V(offset, -.407, -.147)
+          ], .0015, mouthMat);
+        }
+
+        legs.push(leg);
+      }
+    }
+
+    // ----------------------------------------------------------
+    // Harness and rounded backpack
+    // ----------------------------------------------------------
+    function harnessRing(y, z, rx, ry) {
+      const ring = addMesh(
+        new T.TorusGeometry(1, .095, 8, 48),
+        harnessMat,
+        catBody
+      );
+
+      ring.position.set(0, y, z);
+      ring.scale.set(rx, ry, .26);
+      return ring;
+    }
+
+    harnessRing(.585, .065, .251, .259);
+    harnessRing(.694, -.328, .190, .190);
+
+    for (const side of [-1, 1]) {
+      const points = [
+        V(side * .133, .813, -.347),
+        V(side * .175, .853, -.185),
+        V(side * .179, .856, .063),
+        V(side * .228, .724, .172)
+      ];
+
+      tube(catBody, points, .024, harnessMat);
+
+      tube(
+        catBody,
+        points.map(point =>
+          point.clone().add(V(side * .017, .004, 0))
+        ),
+        .0035,
+        trimMat
+      );
+    }
+
+    function roundedBox(w, h, d, radius, mat) {
+      const shape = new T.Shape();
+      const x = -w / 2;
+      const y = -h / 2;
+      const r = radius;
+
+      shape.moveTo(x + r, y);
+      shape.lineTo(x + w - r, y);
+      shape.quadraticCurveTo(x + w, y, x + w, y + r);
+      shape.lineTo(x + w, y + h - r);
+      shape.quadraticCurveTo(
+        x + w, y + h, x + w - r, y + h
+      );
+      shape.lineTo(x + r, y + h);
+      shape.quadraticCurveTo(x, y + h, x, y + h - r);
+      shape.lineTo(x, y + r);
+      shape.quadraticCurveTo(x, y, x + r, y);
+
+      const geometry = new T.ExtrudeGeometry(shape, {
+        depth: d,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        steps: 1,
+        bevelSize: .009,
+        bevelThickness: .009,
+        curveSegments: 8
+      });
+
+      geometry.translate(0, 0, -d / 2);
+      return addMesh(geometry, mat, catBody);
+    }
+
+    const pack = roundedBox(
+      .286, .126, .305, .036, harnessMat
+    );
+    pack.position.set(0, .865, .04);
+
+    const packPanel = roundedBox(
+      .222, .028, .238, .014, trimMat
+    );
+    packPanel.position.set(0, .938, .04);
+
+    const buckle = addMesh(
+      new T.TorusGeometry(.036, .006, 8, 24),
+      metalMat,
+      catBody
+    );
+    buckle.rotation.x = Math.PI / 2;
+    buckle.position.set(0, .963, -.026);
+    buckle.scale.set(1, 1.18, 1);
+
+    ball(
+      catBody, metalMat,
+      0, .526, -.466, .032, .039, .009
+    );
+
+    // ----------------------------------------------------------
+    // Articulated tail
+    // ----------------------------------------------------------
+    const tailRoot = new T.Group();
+    tailRoot.position.set(0, .646, .445);
+    catBody.add(tailRoot);
+
+    const tailBones = [];
+    let previous = tailRoot;
+
+    for (let i = 0; i < 7; i++) {
+      const bone = new T.Group();
+      if (i > 0) bone.position.set(0, .065, .12);
+      previous.add(bone);
+
+      const radius = .048 - i * .004;
+      const tailMat = i >= 4 ? blackFur : orangeFur;
+
+      tube(bone, [
+        V(0, 0, 0),
+        V(0, .030, .057),
+        V(0, .065, .12)
+      ], radius, tailMat);
+
+      ball(
+        bone, tailMat,
+        0, 0, 0, radius, radius, radius
+      );
+
+      if (i === 6) {
+        ball(
+          bone, tailMat,
+          0, .065, .12, radius, radius, radius
+        );
+      }
+
+      tailBones.push(bone);
+      previous = bone;
+    }
+
+    return {
+      cat,
+      catBody,
+      head,
+      legs,
+      tailBones,
+      ears
+    };
   }
 
-  const whiskerMat=new T.LineBasicMaterial({
-    color:'#d4cbb6',transparent:true,opacity:.72
-  });
-  for(const side of [-1,1])for(let i=0;i<3;i++) {
-    const g=new T.BufferGeometry().setFromPoints([
-      V(side*.09,-.09,-.244),
-      V(side*.35,-.085+(i-1)*.043,-.25)
-    ]);
-    head.add(new T.Line(g,whiskerMat));
-  }
+  const {
+    cat, catBody, head, legs, tailBones, ears
+  } = createReferenceCat();
 
-  // Dark woven collar with a small round copper tag.
-  const collar=new T.Mesh(new T.TorusGeometry(.21,.029,8,24),dark);
-  collar.position.set(0,.7,-.36);collar.rotation.x=.4;
-  catBody.add(collar);
-  sphere(0,.51,-.47,.045,.055,.018,terra,catBody);
-
-  const legs=[];
-  for(const x of [-.165,.165])for(const z of [-.3,.31]) {
-    const leg=new T.Group();
-    leg.position.set(x,.45,z);catBody.add(leg);
-    sphere(0,-.12,0,.078,.16,.085,z>0?fur:cream,leg);
-    sphere(0,-.3,-.01,.056,.12,.063,cream,leg);
-    sphere(0,-.395,-.045,.079,.055,.115,cream,leg);
-    // Two understated toe grooves.
-    for(const offset of [-.026,.026])
-      sphere(offset,-.401,-.138,.005,.011,.006,charcoal,leg);
-    legs.push(leg);
-  }
-
-  const tailRoot=new T.Group();
-  tailRoot.position.set(0,.66,.43);catBody.add(tailRoot);
-  const tailBones=[];
-  let previous=tailRoot;
-  for(let i=0;i<7;i++) {
-    const bone=new T.Group();
-    if(i)bone.position.set(0,.065,.12);
-    previous.add(bone);
-    sphere(0,.033,.06,.055-i*.003,.065,.093,
-      i===6?charcoal:(i%3===1?cream:orange),bone);
-    tailBones.push(bone);previous=bone;
-  }
-
-  // Batch only static environmental primitives.
+  // Batch only environmental primitives, never the cat or robot.
   batchStatics();
 
-  // ------------------------------------------------------------
+  // ============================================================
   // Exploration, journal and dialogue
-  // ------------------------------------------------------------
-  const places=[
+  // ============================================================
+  const places = [
     {
-      title:'วิทยุที่ยังเปิดอยู่',
-      pos:V(-3.25,0,6.15),
-      speaker:'คลื่นความถี่ 07',
-      note:'เสียงเบา ๆ ที่ทำให้ทางเข้าตรอกไม่เงียบจนเกินไป',
-      lines:[
+      title: 'วิทยุที่ยังเปิดอยู่',
+      pos: V(-3.25, 0, 6.15),
+      speaker: 'คลื่นความถี่ 07',
+      note: 'เสียงเบา ๆ ที่ทำให้ทางเข้าตรอกไม่เงียบจนเกินไป',
+      lines: [
         'เสียงซ่าแทรกเพลงเก่าที่ไม่มีใครจำชื่อได้ ลูกบิดวิทยุถูกซ่อมด้วยเทปสีเหลือง',
         'ใต้เครื่องมีกระดาษเขียนไว้ว่า “อย่าปิดนะ เดี๋ยวคนกลับบ้านดึกจะเหงา”'
       ]
     },
     {
-      title:'ร้านซ่อมของช่างมะลิ',
-      pos:V(-3.1,0,-6.25),
-      speaker:'ช่างมะลิ',
-      note:'ร้านซ่อมที่รับทั้งเครื่องใช้เก่าและแขกตัวเล็ก',
-      lines:[
+      title: 'ร้านซ่อมของช่างมะลิ',
+      pos: V(-3.1, 0, -6.25),
+      speaker: 'ช่างมะลิ',
+      note: 'ร้านซ่อมที่รับทั้งเครื่องใช้เก่าและแขกตัวเล็ก',
+      lines: [
         'อ้าว… สามสี วันนี้เดินมาถึงนี่เลยเหรอ?',
         'ฉันซ่อมเครื่องนี้มาตั้งแต่หัวค่ำแล้ว พอเงียบลงทีไร ก็ได้ยินเสียงฝนในสายไฟทุกที',
         'ตรงพรมยังอุ่นอยู่ ถ้าเหนื่อยก็นอนก่อนนะ ไม่มีใครคิดค่าเช่าที่แมวหรอก'
       ]
     },
     {
-      title:'ระเบียงเหนือสายไฟ',
-      pos:V(-4.1,2.65,-1.25),
-      speaker:'บนหลังคา',
-      note:'เมื่อขึ้นมาสูงขึ้น เมืองที่ดูคับแคบกลับกว้างกว่าเดิม',
-      lines:[
+      title: 'ระเบียงเหนือสายไฟ',
+      pos: V(-4.1, 2.65, -1.25),
+      speaker: 'บนหลังคา',
+      note: 'เมื่อขึ้นมาสูงขึ้น เมืองที่ดูคับแคบกลับกว้างกว่าเดิม',
+      lines: [
         'จากตรงนี้มองเห็นแสงลอดหน้าต่างทีละบาน สายไฟพาดผ่านเหมือนทางเดินของใครอีกคน',
         'ข้างถ้วยชาเก่ามีรอยอุ้งเท้าหลายรอย ดูเหมือนจะไม่ใช่แมวตัวแรกที่เลือกมุมนี้'
       ]
     },
     {
-      title:'ประตูทางน้ำ',
-      pos:V(0,0,-11.85),
-      speaker:'ปลายตรอก',
-      note:'ประตูปิดอยู่ แต่ยังได้ยินเสียงเมืองจากอีกฝั่ง',
-      lines:[
+      title: 'ประตูทางน้ำ',
+      pos: V(0, 0, -11.85),
+      speaker: 'ปลายตรอก',
+      note: 'ประตูปิดอยู่ แต่ยังได้ยินเสียงเมืองจากอีกฝั่ง',
+      lines: [
         'น้ำค่อย ๆ ไหลลอดใต้ประตูเหล็ก กลิ่นฝนและสนิมเย็นกว่าตรงหน้าร้าน',
         'อีกฝั่งมีเสียงโลหะกระทบกันแผ่ว ๆ คืนนี้คงยังมีใครบางคนทำงานอยู่'
       ]
     }
   ];
-  const discovered=new Set();
-  let activeDialog=null,dialogIndex=0,journalOpen=false;
-  let toastEnd=0,nearest=null,resting=false;
 
-  function toast(text,duration=3.8) {
-    $('#toast').textContent=text;
-    toastEnd=performance.now()+duration*1000;
+  const discovered = new Set();
+
+  let activeDialog = null;
+  let dialogIndex = 0;
+  let journalOpen = false;
+  let toastEnd = 0;
+  let nearest = null;
+  let resting = false;
+
+  // Cache interface elements.
+  const ui = {
+    cover: $('#cover'),
+    play: $('#play'),
+    status: $('#status'),
+    counter: $('#counter'),
+    dots: $('#dots'),
+    toast: $('#toast'),
+    area: $('#area'),
+    hint: $('#hint'),
+    dialog: $('#dialog'),
+    speaker: $('#speaker'),
+    line: $('#line'),
+    journal: $('#journal')
+  };
+
+  function toast(text, duration = 3.8) {
+    ui.toast.textContent = text;
+    toastEnd = performance.now() + duration * 1000;
   }
+
   function updateJournal() {
-    $('#counter').textContent=`${discovered.size} / ${places.length}`;
-    $('#dots').textContent=places.map((_,i)=>discovered.has(i)?'●':'○').join('');
-    $('#journal').innerHTML='<h2>บันทึกจากตรอก</h2>'+
-      places.map((p,i)=>`<div class="entry">
-        ${discovered.has(i)?'✦ '+p.title:'○ สถานที่ที่ยังไม่ได้สำรวจ'}
-        <small>${discovered.has(i)?p.note:'ลองเดินตามแสงไฟ และมองหาทางขึ้นที่สูง'}</small>
-      </div>`).join('');
+    ui.counter.textContent = `${discovered.size} / ${places.length}`;
+    ui.dots.textContent = places
+      .map((_, i) => discovered.has(i) ? '●' : '○')
+      .join('');
+
+    ui.journal.innerHTML = '<h2>บันทึกจากตรอก</h2>' +
+      places.map((place, i) => `
+        <div class="entry">
+          ${discovered.has(i)
+            ? '✦ ' + place.title
+            : '○ สถานที่ที่ยังไม่ได้สำรวจ'}
+          <small>
+            ${discovered.has(i)
+              ? place.note
+              : 'ลองเดินตามแสงไฟ และมองหาทางขึ้นที่สูง'}
+          </small>
+        </div>
+      `).join('');
   }
+
   function closeDialog() {
-    activeDialog=null;$('#dialog').style.display='none';
+    activeDialog = null;
+    ui.dialog.style.display = 'none';
   }
+
   function interact() {
-    if(activeDialog!==null) {
+    if (activeDialog !== null) {
       dialogIndex++;
-      if(dialogIndex>=places[activeDialog].lines.length)closeDialog();
-      else $('#line').textContent=places[activeDialog].lines[dialogIndex];
+
+      if (dialogIndex >= places[activeDialog].lines.length) {
+        closeDialog();
+      } else {
+        ui.line.textContent = places[activeDialog].lines[dialogIndex];
+      }
       return;
     }
-    if(nearest===null)return;
-    activeDialog=nearest;dialogIndex=0;resting=false;
-    const p=places[nearest];
-    $('#speaker').textContent=p.speaker;
-    $('#line').textContent=p.lines[0];
-    $('#dialog').style.display='block';
-    if(!discovered.has(nearest)) {
-      discovered.add(nearest);updateJournal();
-      toast(discovered.size===4?
-        'เรื่องเล่าครบแล้ว — จะเดินเล่นหรือนอนพักต่อก็ได้':
-        'บันทึกสถานที่ใหม่ · '+p.title,4.5);
+
+    if (nearest === null) return;
+
+    activeDialog = nearest;
+    dialogIndex = 0;
+    resting = false;
+
+    const place = places[nearest];
+    ui.speaker.textContent = place.speaker;
+    ui.line.textContent = place.lines[0];
+    ui.dialog.style.display = 'block';
+
+    if (!discovered.has(nearest)) {
+      discovered.add(nearest);
+      updateJournal();
+
+      toast(
+        discovered.size === places.length
+          ? 'เรื่องเล่าครบแล้ว — จะเดินเล่นหรือนอนพักต่อก็ได้'
+          : 'บันทึกสถานที่ใหม่ · ' + place.title,
+        4.5
+      );
     }
   }
+
   updateJournal();
 
-  // ------------------------------------------------------------
-  // Input and a short synthesized meow
-  // ------------------------------------------------------------
-  const keys=new Set();
-  let started=false,jump=false,dragging=false;
-  let yaw=.08,pitch=.35,cameraDistance=4.1;
-  let audio,meowEnd=0;
+  // ============================================================
+  // Input and synthesized meow
+  // ============================================================
+  const keys = new Set();
+
+  let started = false;
+  let jump = false;
+  let dragging = false;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  let yaw = .08;
+  let pitch = .35;
+  let cameraDistance = 4.1;
+
+  let audio;
+  let meowEnd = 0;
 
   function meow() {
-    meowEnd=performance.now()+650;
-    toast(nearest===1?'ช่างมะลิ: “ได้ยินแล้วจ้ะ ตัวเล็ก”':'เหมียว…',2);
+    meowEnd = performance.now() + 650;
+
+    toast(
+      nearest === 1
+        ? 'ช่างมะลิ: “ได้ยินแล้วจ้ะ ตัวเล็ก”'
+        : 'เหมียว…',
+      2
+    );
+
     try {
-      const AC=window.AudioContext||window.webkitAudioContext;
-      if(!AC)return;
-      audio??=new AC();audio.resume();
-      const oscillator=audio.createOscillator();
-      const filter=audio.createBiquadFilter();
-      const gain=audio.createGain(),t=audio.currentTime;
-      oscillator.type='sawtooth';
-      oscillator.frequency.setValueAtTime(540,t);
-      oscillator.frequency.exponentialRampToValueAtTime(780,t+.12);
-      oscillator.frequency.exponentialRampToValueAtTime(310,t+.52);
-      filter.type='lowpass';filter.frequency.value=1100;
-      gain.gain.setValueAtTime(.0001,t);
-      gain.gain.exponentialRampToValueAtTime(.032,t+.07);
-      gain.gain.exponentialRampToValueAtTime(.0001,t+.57);
-      oscillator.connect(filter);filter.connect(gain);gain.connect(audio.destination);
-      oscillator.start(t);oscillator.stop(t+.6);
-    } catch {}
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+
+      audio ??= new AC();
+      audio.resume();
+
+      const oscillator = audio.createOscillator();
+      const filter = audio.createBiquadFilter();
+      const gain = audio.createGain();
+      const time = audio.currentTime;
+
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(540, time);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        780, time + .12
+      );
+      oscillator.frequency.exponentialRampToValueAtTime(
+        310, time + .52
+      );
+
+      filter.type = 'lowpass';
+      filter.frequency.value = 1100;
+
+      gain.gain.setValueAtTime(.0001, time);
+      gain.gain.exponentialRampToValueAtTime(.032, time + .07);
+      gain.gain.exponentialRampToValueAtTime(.0001, time + .57);
+
+      oscillator.connect(filter);
+      filter.connect(gain);
+      gain.connect(audio.destination);
+
+      oscillator.start(time);
+      oscillator.stop(time + .6);
+
+      oscillator.onended = () => {
+        oscillator.disconnect();
+        filter.disconnect();
+        gain.disconnect();
+      };
+    } catch {
+      // Audio failure should not interrupt the game.
+    }
   }
 
-  let vy=0,grounded=true;
-  const velocity=V();
+  let vy = 0;
+  let grounded = true;
+  const velocity = V();
 
   function resetCat() {
-    cat.position.set(0,0,10.5);
-    cat.rotation.y=0;
-    vy=0;velocity.set(0,0,0);grounded=true;
-    yaw=.08;pitch=.35;resting=false;closeDialog();
+    cat.position.set(0, 0, 10.5);
+    cat.rotation.y = 0;
+
+    vy = 0;
+    velocity.set(0, 0, 0);
+    grounded = true;
+    jump = false;
+    resting = false;
+
+    yaw = .08;
+    pitch = .35;
+
+    closeDialog();
     toast('กลับมาที่ทางเข้าตรอก');
   }
 
-  addEventListener('keydown',e=>{
-    if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))
-      e.preventDefault();
-    if(!started)return;
-    keys.add(e.code);
-    if(e.repeat)return;
-    if(e.code==='KeyE')interact();
-    if(e.code==='Escape') {
-      closeDialog();journalOpen=false;$('#journal').style.display='none';
+  addEventListener('keydown', event => {
+    if ([
+      'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
+    ].includes(event.code)) {
+      event.preventDefault();
     }
-    if(e.code==='Space'&&activeDialog===null)jump=true;
-    if(e.code==='KeyQ')meow();
-    if(e.code==='KeyF'&&grounded&&activeDialog===null)resting=!resting;
-    if(e.code==='KeyR')resetCat();
-    if(e.code==='KeyH')document.body.classList.toggle('clean');
-    if(e.code==='KeyJ') {
-      journalOpen=!journalOpen;
-      $('#journal').style.display=journalOpen?'block':'none';
+
+    if (!started) return;
+
+    keys.add(event.code);
+    if (event.repeat) return;
+
+    if (event.code === 'KeyE') interact();
+
+    if (event.code === 'Escape') {
+      closeDialog();
+      journalOpen = false;
+      ui.journal.style.display = 'none';
+    }
+
+    if (event.code === 'Space' && activeDialog === null) {
+      jump = true;
+    }
+
+    if (event.code === 'KeyQ') meow();
+
+    if (
+      event.code === 'KeyF' &&
+      grounded &&
+      activeDialog === null
+    ) {
+      resting = !resting;
+    }
+
+    if (event.code === 'KeyR') resetCat();
+
+    if (event.code === 'KeyH') {
+      document.body.classList.toggle('clean');
+    }
+
+    if (event.code === 'KeyJ') {
+      journalOpen = !journalOpen;
+      ui.journal.style.display = journalOpen ? 'block' : 'none';
     }
   });
-  addEventListener('keyup',e=>keys.delete(e.code));
-  addEventListener('blur',()=>{keys.clear();jump=false;dragging=false;});
 
-  const canvas=renderer.domElement;
-  canvas.addEventListener('pointerdown',e=>{
-    if(!started)return;
-    dragging=true;canvas.setPointerCapture(e.pointerId);
+  addEventListener('keyup', event => {
+    keys.delete(event.code);
   });
-  canvas.addEventListener('pointerup',()=>dragging=false);
-  canvas.addEventListener('pointercancel',()=>dragging=false);
-  canvas.addEventListener('pointermove',e=>{
-    if(!dragging)return;
-    yaw-=e.movementX*.005;
-    pitch=T.MathUtils.clamp(pitch+e.movementY*.004,.12,.95);
-  });
-  canvas.addEventListener('wheel',e=>{
-    e.preventDefault();
-    cameraDistance=T.MathUtils.clamp(cameraDistance+e.deltaY*.003,2.2,5.5);
-  },{passive:false});
-  canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
-  $('#play').disabled=false;
-  $('#play').textContent='เข้าตรอก';
-  $('#status').textContent='พร้อมแล้ว • เลื่อนล้อเมาส์เพื่อปรับระยะกล้อง';
-  $('#play').onclick=()=>{
-    started=true;$('#cover').style.display='none';
-    toast('ไม่ต้องรีบ — ลองฟังวิทยุทางซ้ายก่อนก็ได้',5);
+  addEventListener('blur', () => {
+    keys.clear();
+    jump = false;
+    dragging = false;
+  });
+
+  const canvas = renderer.domElement;
+
+  canvas.addEventListener('pointerdown', event => {
+    if (!started || !event.isPrimary) return;
+
+    dragging = true;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    canvas.setPointerCapture(event.pointerId);
+  });
+
+  canvas.addEventListener('pointerup', event => {
+    if (event.isPrimary) dragging = false;
+  });
+
+  canvas.addEventListener('pointercancel', () => {
+    dragging = false;
+  });
+
+  canvas.addEventListener('lostpointercapture', () => {
+    dragging = false;
+  });
+
+  canvas.addEventListener('pointermove', event => {
+    if (!dragging || !event.isPrimary) return;
+
+    const movementX = event.clientX - pointerX;
+    const movementY = event.clientY - pointerY;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+
+    yaw -= movementX * .005;
+    pitch = T.MathUtils.clamp(
+      pitch + movementY * .004, .12, .95
+    );
+  });
+
+  canvas.addEventListener('wheel', event => {
+    event.preventDefault();
+
+    if (!started) return;
+
+    cameraDistance = T.MathUtils.clamp(
+      cameraDistance + event.deltaY * .003,
+      1.65,
+      5.5
+    );
+  }, { passive: false });
+
+  canvas.addEventListener('contextmenu', event => {
+    event.preventDefault();
+  });
+
+  ui.play.disabled = false;
+  ui.play.textContent = 'เข้าตรอก';
+  ui.status.textContent =
+    'พร้อมแล้ว • ใช้คีย์บอร์ดเดิน และลากเมาส์หมุนดูตัวแมว';
+
+  ui.play.onclick = () => {
+    started = true;
+    ui.cover.style.display = 'none';
+
+    toast(
+      'ไม่ต้องรีบ — ลองฟังวิทยุทางซ้ายก่อนก็ได้',
+      5
+    );
   };
 
-  // ------------------------------------------------------------
-  // Kinematic movement: walls, crates, thin roofs and ceilings
-  // ------------------------------------------------------------
-  const catRadius=.235,catHeight=1.05;
-  function overlap(x,z,s) {
-    return x+catRadius>s.minX&&x-catRadius<s.maxX&&
-      z+catRadius>s.minZ&&z-catRadius<s.maxZ;
+  // ============================================================
+  // Kinematic movement and collisions
+  // ============================================================
+  const catRadius = .235;
+  const catHeight = 1.22;
+
+  function overlap(x, z, solid) {
+    return (
+      x + catRadius > solid.minX &&
+      x - catRadius < solid.maxX &&
+      z + catRadius > solid.minZ &&
+      z - catRadius < solid.maxZ
+    );
   }
-  function blocked(x,z,y) {
-    return solids.some(s=>
-      overlap(x,z,s)&&y<s.top-.025&&y+catHeight>s.bottom+.025
+
+  function blocked(x, z, y) {
+    return solids.some(solid =>
+      overlap(x, z, solid) &&
+      y < solid.top - .025 &&
+      y + catHeight > solid.bottom + .025
     );
   }
 
   function physics(dt) {
-    const steps=3,step=dt/steps;
-    for(let i=0;i<steps;i++) {
-      const nx=cat.position.x+velocity.x*step;
-      if(!blocked(nx,cat.position.z,cat.position.y))cat.position.x=nx;
-      const nz=cat.position.z+velocity.z*step;
-      if(!blocked(cat.position.x,nz,cat.position.y))cat.position.z=nz;
+    const steps = 3;
+    const step = dt / steps;
 
-      const oldY=cat.position.y;
-      vy-=14.5*step;
-      let nextY=oldY+vy*step;
-      let land=0,ceiling=Infinity;
-      for(const s of solids) {
-        if(!overlap(cat.position.x,cat.position.z,s))continue;
-        if(vy<=0&&oldY>=s.top-.03&&nextY<=s.top)
-          land=Math.max(land,s.top);
-        if(vy>0&&oldY+catHeight<=s.bottom+.015&&nextY+catHeight>=s.bottom)
-          ceiling=Math.min(ceiling,s.bottom-catHeight);
+    for (let i = 0; i < steps; i++) {
+      const nextX = cat.position.x + velocity.x * step;
+
+      if (!blocked(nextX, cat.position.z, cat.position.y)) {
+        cat.position.x = nextX;
       }
-      grounded=false;
-      if(vy>0&&nextY>=ceiling) {nextY=ceiling;vy=0;}
-      if(vy<=0&&nextY<=land) {nextY=land;vy=0;grounded=true;}
-      cat.position.y=nextY;
+
+      const nextZ = cat.position.z + velocity.z * step;
+
+      if (!blocked(cat.position.x, nextZ, cat.position.y)) {
+        cat.position.z = nextZ;
+      }
+
+      const oldY = cat.position.y;
+      vy -= 14.5 * step;
+
+      let nextY = oldY + vy * step;
+      let land = 0;
+      let ceiling = Infinity;
+
+      for (const solid of solids) {
+        if (!overlap(cat.position.x, cat.position.z, solid)) {
+          continue;
+        }
+
+        if (
+          vy <= 0 &&
+          oldY >= solid.top - .03 &&
+          nextY <= solid.top
+        ) {
+          land = Math.max(land, solid.top);
+        }
+
+        if (
+          vy > 0 &&
+          oldY + catHeight <= solid.bottom + .015 &&
+          nextY + catHeight >= solid.bottom
+        ) {
+          ceiling = Math.min(
+            ceiling, solid.bottom - catHeight
+          );
+        }
+      }
+
+      grounded = false;
+
+      if (vy > 0 && nextY >= ceiling) {
+        nextY = ceiling;
+        vy = 0;
+      }
+
+      if (vy <= 0 && nextY <= land) {
+        nextY = land;
+        vy = 0;
+        grounded = true;
+      }
+
+      cat.position.y = nextY;
     }
-    cat.position.x=T.MathUtils.clamp(cat.position.x,-5.65,5.65);
-    cat.position.z=T.MathUtils.clamp(cat.position.z,-13.4,13.4);
+
+    cat.position.x = T.MathUtils.clamp(
+      cat.position.x, -5.65, 5.65
+    );
+    cat.position.z = T.MathUtils.clamp(
+      cat.position.z, -13.4, 13.4
+    );
   }
 
-  // ------------------------------------------------------------
-  // Camera: orbit with collision against the same solid volumes
-  // ------------------------------------------------------------
-  const target=V(),desired=V(),direction=V(),hit=V();
-  const cameraRay=new T.Ray();
-  camera.position.set(.6,2.2,13.5);
+  // ============================================================
+  // Orbit camera with collision
+  // ============================================================
+  const target = V();
+  const desired = V();
+  const direction = V();
+  const hit = V();
+  const cameraRay = new T.Ray();
+
+  camera.position.set(.6, 2.2, 13.5);
+
   function updateCamera(dt) {
-    target.copy(cat.position).add(V(0,resting?.55:.77,0));
+    target.copy(cat.position);
+    target.y += resting ? .55 : .77;
+
     desired.set(
-      Math.sin(yaw)*cameraDistance*Math.cos(pitch),
-      Math.sin(pitch)*cameraDistance+.3,
-      Math.cos(yaw)*cameraDistance*Math.cos(pitch)
+      Math.sin(yaw) * cameraDistance * Math.cos(pitch),
+      Math.sin(pitch) * cameraDistance + .3,
+      Math.cos(yaw) * cameraDistance * Math.cos(pitch)
     ).add(target);
+
     direction.copy(desired).sub(target).normalize();
-    cameraRay.set(target,direction);
-    let distance=desired.distanceTo(target);
-    for(const s of solids) {
-      if(s.box.containsPoint(target))continue;
-      if(cameraRay.intersectBox(s.box,hit)) {
-        const d=hit.distanceTo(target)-.13;
-        if(d<distance)distance=Math.max(.2,d);
+    cameraRay.set(target, direction);
+
+    let distance = desired.distanceTo(target);
+
+    for (const solid of solids) {
+      if (solid.box.containsPoint(target)) continue;
+
+      if (cameraRay.intersectBox(solid.box, hit)) {
+        const d = hit.distanceTo(target) - .13;
+        if (d < distance) distance = Math.max(.2, d);
       }
     }
-    desired.copy(target).addScaledVector(direction,distance);
 
-    if(camera.position.distanceTo(target)>distance+.1)
+    desired.copy(target).addScaledVector(direction, distance);
+
+    if (camera.position.distanceTo(target) > distance + .1) {
       camera.position.copy(desired);
-    else camera.position.lerp(desired,1-Math.exp(-11*dt));
-
-    // Check the smoothed position as well.
-    direction.copy(camera.position).sub(target);
-    const currentDistance=direction.length();
-    cameraRay.set(target,direction.normalize());
-    for(const s of solids) {
-      if(s.box.containsPoint(target))continue;
-      if(cameraRay.intersectBox(s.box,hit)) {
-        const d=hit.distanceTo(target);
-        if(d<currentDistance)
-          camera.position.copy(target).addScaledVector(direction,Math.max(.18,d-.13));
-      }
+    } else {
+      camera.position.lerp(
+        desired, 1 - Math.exp(-11 * dt)
+      );
     }
-    camera.position.y=Math.max(.18,camera.position.y);
+
+    // Validate the smoothed position too.
+    direction.copy(camera.position).sub(target);
+    let safeDistance = direction.length();
+
+    if (safeDistance > .0001) {
+      direction.normalize();
+      cameraRay.set(target, direction);
+
+      for (const solid of solids) {
+        if (solid.box.containsPoint(target)) continue;
+
+        if (cameraRay.intersectBox(solid.box, hit)) {
+          const d = hit.distanceTo(target);
+
+          if (d < safeDistance) {
+            safeDistance = Math.max(.18, d - .13);
+          }
+        }
+      }
+
+      camera.position.copy(target).addScaledVector(
+        direction, safeDistance
+      );
+    }
+
+    camera.position.y = Math.max(.18, camera.position.y);
     camera.lookAt(target);
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // Game loop
-  // ------------------------------------------------------------
-  let last=performance.now(),walkPhase=0;
-  const before=V();
+  // ============================================================
+  let last = performance.now();
+  let walkPhase = 0;
+  const before = V();
 
   function frame(now) {
     requestAnimationFrame(frame);
-    const dt=Math.min((now-last)/1000,.033);
-    last=now;
-    const t=now/1000;
 
-    const ix=started?Number(keys.has('KeyD')||keys.has('ArrowRight'))-
-      Number(keys.has('KeyA')||keys.has('ArrowLeft')):0;
-    const iz=started?Number(keys.has('KeyW')||keys.has('ArrowUp'))-
-      Number(keys.has('KeyS')||keys.has('ArrowDown')):0;
-    const canMove=activeDialog===null;
-    const input=(ix!==0||iz!==0)&&canMove;
-    const running=keys.has('ShiftLeft')||keys.has('ShiftRight');
+    const dt = Math.min((now - last) / 1000, .033);
+    last = now;
 
-    let dx=0,dz=0;
-    if(input) {
-      resting=false;
-      const length=Math.hypot(ix,iz);
-      dx=(Math.cos(yaw)*ix-Math.sin(yaw)*iz)/length;
-      dz=(-Math.sin(yaw)*ix-Math.cos(yaw)*iz)/length;
+    const time = now / 1000;
+
+    const ix = started
+      ? Number(keys.has('KeyD') || keys.has('ArrowRight')) -
+        Number(keys.has('KeyA') || keys.has('ArrowLeft'))
+      : 0;
+
+    const iz = started
+      ? Number(keys.has('KeyW') || keys.has('ArrowUp')) -
+        Number(keys.has('KeyS') || keys.has('ArrowDown'))
+      : 0;
+
+    const canMove = activeDialog === null;
+    const input = (ix !== 0 || iz !== 0) && canMove;
+    const running =
+      keys.has('ShiftLeft') || keys.has('ShiftRight');
+
+    let dx = 0;
+    let dz = 0;
+
+    if (input) {
+      resting = false;
+
+      const length = Math.hypot(ix, iz);
+
+      dx = (
+        Math.cos(yaw) * ix -
+        Math.sin(yaw) * iz
+      ) / length;
+
+      dz = (
+        -Math.sin(yaw) * ix -
+        Math.cos(yaw) * iz
+      ) / length;
     }
-    const speed=running?3.65:1.95;
-    velocity.x=T.MathUtils.lerp(velocity.x,dx*speed,1-Math.exp(-15*dt));
-    velocity.z=T.MathUtils.lerp(velocity.z,dz*speed,1-Math.exp(-15*dt));
-    if(activeDialog!==null||resting)velocity.set(0,0,0);
 
-    if(jump&&grounded&&canMove) {
-      resting=false;vy=5.7;grounded=false;
+    const speed = running ? 3.65 : 1.95;
+    const velocityBlend = 1 - Math.exp(-15 * dt);
+
+    velocity.x = T.MathUtils.lerp(
+      velocity.x, dx * speed, velocityBlend
+    );
+    velocity.z = T.MathUtils.lerp(
+      velocity.z, dz * speed, velocityBlend
+    );
+
+    if (activeDialog !== null || resting) {
+      velocity.set(0, 0, 0);
     }
-    jump=false;
+
+    if (jump && grounded && canMove) {
+      resting = false;
+      vy = 5.7;
+      grounded = false;
+    }
+
+    jump = false;
 
     before.copy(cat.position);
     physics(dt);
-    const moved=Math.hypot(cat.position.x-before.x,cat.position.z-before.z);
-    const walking=moved>.0005&&grounded;
 
-    if(input) {
-      const angle=Math.atan2(-dx,-dz);
-      const difference=Math.atan2(
-        Math.sin(angle-cat.rotation.y),Math.cos(angle-cat.rotation.y)
-      );
-      cat.rotation.y+=difference*(1-Math.exp(-12*dt));
-    }
-
-    walkPhase+=moved*(running?6.8:9.5);
-    legs.forEach((leg,i)=>{
-      const phase=(i===0||i===3)?0:Math.PI;
-      let angle=walking?Math.sin(walkPhase+phase)*.5:0;
-      if(!grounded)angle=i%2===0?-.35:.4;
-      if(resting)angle=i%2===0?-.85:.9;
-      leg.rotation.x=T.MathUtils.lerp(leg.rotation.x,angle,Math.min(1,dt*15));
-    });
-    const bodyY=resting?-.14:walking?Math.sin(walkPhase*2)*.016:Math.sin(t*2.2)*.006;
-    catBody.position.y=T.MathUtils.lerp(catBody.position.y,bodyY,Math.min(1,dt*8));
-    head.rotation.x=T.MathUtils.lerp(
-      head.rotation.x,now<meowEnd?-.16:resting?.14:Math.sin(t*1.3)*.025,
-      Math.min(1,dt*8)
+    const moved = Math.hypot(
+      cat.position.x - before.x,
+      cat.position.z - before.z
     );
-    tailBones.forEach((bone,i)=>{
-      bone.rotation.z=Math.sin(t*2.2-i*.5)*(resting?.035:.075);
-      bone.rotation.x=resting?.14:running?.04:-.02;
-    });
 
-    nearest=null;
-    let nearestDistance=1.7;
-    places.forEach((p,i)=>{
-      if(Math.abs(cat.position.y-p.pos.y)>.8)return;
-      const distance=Math.hypot(cat.position.x-p.pos.x,cat.position.z-p.pos.z);
-      if(distance<nearestDistance){nearestDistance=distance;nearest=i;}
-    });
+    const walking = moved > .0005 && grounded;
 
-    $('#hint').style.display=nearest!==null&&activeDialog===null?'block':'none';
-    if(nearest!==null)
-      $('#hint').textContent='E · '+places[nearest].title;
-    $('#area').textContent=
-      resting?'พักสักครู่':
-      cat.position.y>2?'ระเบียงเหนือสายไฟ':
-      cat.position.z<-9?'ทางน้ำเก่า':
-      cat.position.z<-3?'ร้านซ่อมท้ายตรอก':
-      cat.position.z<4?'ใต้สะพานไม้':'ทางเข้าตรอก';
+    if (input) {
+      const angle = Math.atan2(-dx, -dz);
+      const difference = Math.atan2(
+        Math.sin(angle - cat.rotation.y),
+        Math.cos(angle - cat.rotation.y)
+      );
 
-    robotHead.rotation.y=nearest===1?Math.sin(t*.8)*.08:.12;
-    robotHead.rotation.x=Math.sin(t*1.2)*.025;
-    robotArm.rotation.z=nearest===1?-.12+Math.sin(t*2)*.08:Math.sin(t*.7)*.035;
-
-    for(let i=0;i<dustCount;i++) {
-      dustData[i*3]+=Math.sin(t*.3+i)*dt*.014;
-      dustData[i*3+1]+=dt*.025;
-      if(dustData[i*3+1]>7)dustData[i*3+1]=.2;
+      cat.rotation.y += difference * (
+        1 - Math.exp(-12 * dt)
+      );
     }
-    dustGeo.attributes.position.needsUpdate=true;
-    $('#toast').style.opacity=now<toastEnd?'1':'0';
+
+    // ----------------------------------------------------------
+    // Cat animation
+    // ----------------------------------------------------------
+    walkPhase += moved * (running ? 6.8 : 9.5);
+
+    legs.forEach((leg, i) => {
+      const phase = (i === 0 || i === 3) ? 0 : Math.PI;
+
+      let angle = walking
+        ? Math.sin(walkPhase + phase) * .5
+        : 0;
+
+      if (!grounded) {
+        angle = i % 2 === 0 ? -.35 : .4;
+      }
+
+      if (resting) {
+        angle = i % 2 === 0 ? -.85 : .9;
+      }
+
+      leg.rotation.x = T.MathUtils.lerp(
+        leg.rotation.x,
+        angle,
+        Math.min(1, dt * 15)
+      );
+    });
+
+    const bodyY = resting
+      ? -.14
+      : walking
+        ? Math.sin(walkPhase * 2) * .016
+        : Math.sin(time * 2.2) * .006;
+
+    catBody.position.y = T.MathUtils.lerp(
+      catBody.position.y,
+      bodyY,
+      Math.min(1, dt * 8)
+    );
+
+    const headTilt = now < meowEnd
+      ? -.16
+      : resting
+        ? .14
+        : Math.sin(time * 1.3) * .025;
+
+    head.rotation.x = T.MathUtils.lerp(
+      head.rotation.x,
+      headTilt,
+      Math.min(1, dt * 8)
+    );
+
+    head.rotation.y = T.MathUtils.lerp(
+      head.rotation.y,
+      walking ? 0 : Math.sin(time * .65) * .045,
+      Math.min(1, dt * 5)
+    );
+
+    ears.forEach((ear, i) => {
+      const twitch = Math.pow(
+        Math.max(0, Math.sin(time * .72 + i * 2.6)),
+        18
+      );
+
+      ear.rotation.z =
+        ear.userData.baseZ +
+        (i === 0 ? -1 : 1) * twitch * .065;
+
+      ear.rotation.y = now < meowEnd
+        ? (i === 0 ? -.08 : .08)
+        : Math.sin(time * .8 + i) * .018;
+    });
+
+    tailBones.forEach((bone, i) => {
+      bone.rotation.z =
+        Math.sin(time * 2.2 - i * .5) *
+        (resting ? .035 : .075);
+
+      bone.rotation.x = resting
+        ? .14
+        : walking && running
+          ? .04
+          : -.02;
+    });
+
+    // ----------------------------------------------------------
+    // Nearby locations and interface
+    // ----------------------------------------------------------
+    nearest = null;
+    let nearestDistance = 1.7;
+
+    places.forEach((place, i) => {
+      if (Math.abs(cat.position.y - place.pos.y) > .8) {
+        return;
+      }
+
+      const distance = Math.hypot(
+        cat.position.x - place.pos.x,
+        cat.position.z - place.pos.z
+      );
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = i;
+      }
+    });
+
+    ui.hint.style.display =
+      nearest !== null && activeDialog === null
+        ? 'block'
+        : 'none';
+
+    if (nearest !== null) {
+      ui.hint.textContent = 'E · ' + places[nearest].title;
+    }
+
+    ui.area.textContent = resting
+      ? 'พักสักครู่'
+      : cat.position.y > 2
+        ? 'ระเบียงเหนือสายไฟ'
+        : cat.position.z < -9
+          ? 'ทางน้ำเก่า'
+          : cat.position.z < -3
+            ? 'ร้านซ่อมท้ายตรอก'
+            : cat.position.z < 4
+              ? 'ใต้สะพานไม้'
+              : 'ทางเข้าตรอก';
+
+    robotHead.rotation.y = nearest === 1
+      ? Math.sin(time * .8) * .08
+      : .12;
+
+    robotHead.rotation.x = Math.sin(time * 1.2) * .025;
+
+    robotArm.rotation.z = nearest === 1
+      ? -.12 + Math.sin(time * 2) * .08
+      : Math.sin(time * .7) * .035;
+
+    for (let i = 0; i < dustCount; i++) {
+      dustData[i * 3] +=
+        Math.sin(time * .3 + i) * dt * .014;
+
+      dustData[i * 3 + 1] += dt * .025;
+
+      if (dustData[i * 3 + 1] > 7) {
+        dustData[i * 3 + 1] = .2;
+      }
+    }
+
+    dustGeo.attributes.position.needsUpdate = true;
+    ui.toast.style.opacity = now < toastEnd ? '1' : '0';
 
     updateCamera(dt);
     composer.render();
   }
+
   requestAnimationFrame(frame);
 
-  addEventListener('resize',()=>{
-    camera.aspect=innerWidth/innerHeight;
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth,innerHeight);
-    composer.setSize(innerWidth,innerHeight);
+
+    renderer.setSize(innerWidth, innerHeight);
+    composer.setSize(innerWidth, innerHeight);
   });
 
-} catch(error) {
+} catch (error) {
   console.error(error);
-  $('#status').textContent=
-    'โหลดเกมไม่สำเร็จ: '+error.message+
-    ' — ตรวจสอบอินเทอร์เน็ต เปิดผ่าน local server และใช้เบราว์เซอร์ที่รองรับ WebGL 2';
-  $('#play').textContent='เปิดเกมไม่สำเร็จ';
+
+  $('#status').textContent =
+    'โหลดเกมไม่สำเร็จ: ' + error.message +
+    ' — ตรวจสอบอินเทอร์เน็ต เปิดผ่าน local server ' +
+    'และใช้เบราว์เซอร์ที่รองรับ WebGL 2';
+
+  $('#play').disabled = true;
+  $('#play').textContent = 'เปิดเกมไม่สำเร็จ';
 }
 </script>
 </body>
