@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Neon Escape — Cyberpunk Runner</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:#030510;color:#fff;
+font-family:system-ui,sans-serif}
+canvas{display:block;width:100vw;height:100vh}
+#hud{position:fixed;top:22px;left:24px;pointer-events:none}
+.logo{color:#00ffff;letter-spacing:4px;font-weight:900;
+text-shadow:0 0 16px #00ffff}
+#score{font-size:30px;font-weight:800}
+#hint{color:#a6aecf;font-size:13px}
+#overlay{position:fixed;inset:0;display:grid;place-items:center;
+background:#03051099;backdrop-filter:blur(5px)}
+.panel{width:min(430px,90vw);padding:32px;text-align:center;
+border:1px solid #00ffff88;background:#080b20ee;
+box-shadow:0 0 60px #00ffff20;border-radius:20px}
+h1{font-size:38px;margin:0;color:#00ffff;text-shadow:3px 3px #ff168b}
+p{line-height:1.8;color:#c2c8e4}
+button{cursor:pointer;border:1px solid #00ffff;background:#00ffff18;
+color:#fff;border-radius:10px;font:700 18px system-ui;
+padding:13px 25px;touch-action:manipulation}
+button:hover{background:#00ffff44}
+#controls{position:fixed;bottom:24px;left:0;right:0;
+display:flex;justify-content:space-between;padding:0 25px;
+pointer-events:none}
+#controls button{pointer-events:auto;width:80px;height:64px;
+background:#080b20bb;font-size:28px;user-select:none}
+#credit{position:fixed;right:20px;top:24px;color:#ff48ae;
+font-size:12px;letter-spacing:2px}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+  <div class="logo">NEON ESCAPE</div>
+  <div id="score">00000</div>
+  <div id="hint">ชิปพลังงาน: 0</div>
+</div>
+<div id="credit">SECTOR // 07</div>
+<div id="controls">
+  <button id="left" aria-label="เลื่อนไปซ้าย">←</button>
+  <button id="right" aria-label="เลื่อนไปขวา">→</button>
+</div>
+<div id="overlay">
+  <div class="panel">
+    <h1 id="title">NEON ESCAPE</h1>
+    <p id="message">หลบกำแพงสีชมพู เก็บชิปสีฟ้า<br>
+    แล้วหนีออกจากเมืองนีออนให้ไกลที่สุด<br>
+    ใช้ ← → หรือ A / D เพื่อเปลี่ยนเลน</p>
+    <button id="start">เริ่มวิ่ง ⚡</button>
+  </div>
+</div>
+<script>
+"use strict";
+const canvas = document.querySelector("#game");
+const ctx = canvas.getContext("2d");
+const scoreEl = document.querySelector("#score");
+const hintEl = document.querySelector("#hint");
+const overlay = document.querySelector("#overlay");
+
+let W, H, DPR, focal;
+function resize(){
+  W = innerWidth;
+  H = innerHeight;
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  focal = Math.min(W * .9, H * .95);
+}
+addEventListener("resize", resize);
+resize();
+
+let running = false, lane = 0, playerX = 0;
+let distance = 0, chips = 0, speed = 24;
+let objects = [], spawnTimer = 0, last = 0, clock = 0;
+let flash = 0;
+const lanes = [-2.4, 0, 2.4];
+const playerZ = 7;
+const rand = (a,b) => a + Math.random() * (b-a);
+
+// World-space geometry projected through a perspective camera.
+function project(x,y,z){
+  const scale = focal / Math.max(.15,z);
+  return {x:W/2 + x*scale, y:H*.34 + (3.2-y)*scale};
+}
+function polygon(points, fill, stroke, glow=0){
+  ctx.beginPath();
+  points.forEach((p,i) => i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if(stroke){
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1.3;
+    ctx.shadowColor = stroke;
+    ctx.shadowBlur = glow;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+}
+function line(a,b,color,width=1){
+  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();
+}
+function box(x,y,z,w,h,d,color){
+  if(z-d/2 <= .2) return;
+  const v = [
+    [x-w/2,y,z-d/2],[x+w/2,y,z-d/2],
+    [x+w/2,y+h,z-d/2],[x-w/2,y+h,z-d/2],
+    [x-w/2,y,z+d/2],[x+w/2,y,z+d/2],
+    [x+w/2,y+h,z+d/2],[x-w/2,y+h,z+d/2]
+  ];
+  const faces = [
+    {ids:[4,5,6,7],fill:"#080d22"},
+    {ids:[0,4,7,3],fill:"#11162e"},
+    {ids:[1,5,6,2],fill:"#10132a"},
+    {ids:[3,2,6,7],fill:"#202844"},
+    {ids:[0,1,2,3],fill:"#0b1025"}
+  ];
+  faces.sort((a,b) =>
+    b.ids.reduce((s,i)=>s+v[i][2],0) -
+    a.ids.reduce((s,i)=>s+v[i][2],0));
+  ctx.globalAlpha = Math.max(.08, Math.min(1,(150-z)/45));
+  for(const f of faces){
+    polygon(f.ids.map(i=>project(...v[i])),f.fill,color,5);
+  }
+  ctx.globalAlpha=1;
+}
+
+const buildings = [];
+for(let i=0;i<48;i++){
+  const side = i%2 ? 1 : -1;
+  buildings.push({
+    x:side*rand(6.5,17), z:rand(3,145),
+    w:rand(2,4.5), h:rand(5,21), d:rand(3,7),
+    color:Math.random()<.5 ? "#087c9c" : "#912a88"
+  });
+}
+const stars = Array.from({length:75},()=>({
+  x:Math.random(), y:Math.random()*.34, a:rand(.2,.8)
+}));
+
+function move(dir){
+  if(running) lane = Math.max(-1,Math.min(1,lane+dir));
+}
+document.querySelector("#left").onpointerdown = ()=>move(-1);
+document.querySelector("#right").onpointerdown = ()=>move(1);
+addEventListener("keydown",e=>{
+  if(["ArrowLeft","ArrowRight"," "].includes(e.key)) e.preventDefault();
+  if(e.repeat) return;
+  const k=e.key.toLowerCase();
+  if(k==="arrowleft" || k==="a") move(-1);
+  if(k==="arrowright" || k==="d") move(1);
+  if(k===" " && !running) start();
+});
+function start(){
+  running=true;lane=0;playerX=0;distance=0;chips=0;
+  speed=24;objects=[];spawnTimer=.5;flash=0;
+  overlay.style.display="none";
+}
+document.querySelector("#start").onclick=start;
+
+function end(){
+  running=false;
+  document.querySelector("#title").textContent="SIGNAL LOST";
+  document.querySelector("#message").textContent =
+    `ได้ ${Math.floor(distance+chips*100)} คะแนน • เก็บชิป ${chips} ชิ้น — ลองหนีอีกครั้งไหม?`;
+  document.querySelector("#start").textContent="เริ่มใหม่ ↻";
+  overlay.style.display="grid";
+}
+function spawn(){
+  // One barrier per wave leaves two lanes open.
+  const blocked = Math.floor(Math.random()*3);
+  objects.push({x:lanes[blocked],z:115,type:"wall",done:false});
+  if(Math.random()<.8){
+    const free = [0,1,2].filter(i=>i!==blocked);
+    const index=free[Math.floor(Math.random()*free.length)];
+    objects.push({x:lanes[index],z:115,type:"chip",done:false});
+  }
+}
+function update(dt){
+  const travel = running ? speed*dt : 5*dt;
+  for(const b of buildings){
+    b.z-=travel;
+    if(b.z< -8) b.z+=153;
+  }
+  flash=Math.max(0,flash-dt*3);
+  if(!running) return;
+  distance+=travel;
+  speed=Math.min(52,24+distance*.009);
+  playerX+=(lane*2.4-playerX)*Math.min(1,dt*16);
+  spawnTimer-=dt;
+  if(spawnTimer<=0){
+    spawn();
+    spawnTimer=rand(.9,1.25);
+  }
+  for(const o of objects){
+    const previous=o.z;
+    o.z-=travel;
+    if(o.type==="wall"){
+      const inDepth = o.z<=playerZ+.95 && previous>=playerZ-.95;
+      if(inDepth && Math.abs(o.x-playerX)<1.12){
+        end();
+        break;
+      }
+    }else if(!o.done && o.z<=playerZ+.7 && previous>=playerZ-.7){
+      if(Math.abs(o.x-playerX)<.9){
+        o.done=true;chips++;flash=.65;
+      }
+    }
+  }
+  objects=objects.filter(o=>o.z>1 && !o.done);
+  scoreEl.textContent=String(Math.floor(distance+chips*100)).padStart(5,"0");
+  hintEl.textContent=`ชิปพลังงาน: ${chips} • ความเร็ว: ${Math.round(speed)}`;
+}
+function draw(){
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,"#030510");
+  bg.addColorStop(.48,"#160b30");
+  bg.addColorStop(1,"#030612");
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  for(const s of stars){
+    ctx.globalAlpha=s.a;
+    ctx.fillStyle="#b2d9ff";ctx.fillRect(s.x*W,s.y*H,1.5,1.5);
+  }
+  ctx.globalAlpha=1;
+
+  const moon=project(0,12,85);
+  ctx.shadowBlur=35;ctx.shadowColor="#ff168b";
+  ctx.fillStyle="#ff168b";
+  ctx.beginPath();ctx.arc(moon.x,moon.y,focal*.075,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
+
+  polygon([
+    project(-4,0,150),project(4,0,150),
+    project(4,0,1),project(-4,0,1)
+  ],"#060a19");
+
+  for(const x of [-4,-1.2,1.2,4]){
+    line(project(x,.01,1),project(x,.01,150),
+      Math.abs(x)===4 ? "#ff168b" : "#075069",Math.abs(x)===4 ? 2 : 1);
+  }
+  const offset=(distance+clock*(!running ? 5 : 0))%6;
+  for(let z=6-offset;z<150;z+=6){
+    if(z>1) line(project(-4,.01,z),project(4,.01,z),"#113449");
+  }
+
+  const renderables=buildings.map(b=>({...b,kind:"building"}));
+  for(const o of objects) renderables.push({...o,kind:o.type});
+  renderables.push({x:playerX,z:playerZ,kind:"player"});
+  renderables.sort((a,b)=>b.z-a.z);
+
+  for(const r of renderables){
+    if(r.kind==="building"){
+      box(r.x,0,r.z,r.w,r.h,r.d,r.color);
+      const front=r.z-r.d/2-.02;
+      if(front>.2){
+        for(let y=1.5;y<r.h-1;y+=2){
+          line(project(r.x-r.w*.32,y,front),
+            project(r.x+r.w*.32,y,front),r.color,2);
+        }
+      }
+    }else if(r.kind==="wall"){
+      box(r.x,0,r.z,1.65,1.65,1.1,"#ff237c");
+      if(r.z>.8){
+        line(project(r.x-.6,.2,r.z-.57),
+          project(r.x+.6,1.45,r.z-.57),"#ffb4d7",3);
+        line(project(r.x+.6,.2,r.z-.57),
+          project(r.x-.6,1.45,r.z-.57),"#ffb4d7",3);
+      }
+    }else if(r.kind==="chip"){
+      box(r.x,.8+Math.sin(clock*5)*.15,r.z,.55,.55,.55,"#00ffff");
+    }else{
+      const bob=Math.sin(clock*14)*.035;
+      box(r.x,.15+bob,r.z,.65,.4,1.05,"#00ffff");
+      box(r.x,.55+bob,r.z,.4,.45,.5,"#c75cff");
+      const p=project(r.x,.2,r.z-.7);
+      ctx.shadowColor="#00ffff";ctx.shadowBlur=20;
+      ctx.fillStyle="#baffff";
+      ctx.fillRect(p.x-9,p.y,18,4);
+      ctx.shadowBlur=0;
+    }
+  }
+
+  // Subtle scanlines.
+  ctx.fillStyle="#00000018";
+  for(let y=0;y<H;y+=4) ctx.fillRect(0,y,W,1);
+  if(flash>0){
+    ctx.fillStyle=`rgba(0,255,255,${flash*.18})`;
+    ctx.fillRect(0,0,W,H);
+  }
+}
+function frame(time){
+  const dt=Math.min((time-last)/1000 || 0,.04);
+  last=time;clock+=dt;
+  update(dt);draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
