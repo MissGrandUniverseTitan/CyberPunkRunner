@@ -2,307 +2,570 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Neon Escape — Cyberpunk Runner</title>
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>NEON DISTRICT — Explore</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#030510;color:#fff;
-font-family:system-ui,sans-serif}
-canvas{display:block;width:100vw;height:100vh}
-#hud{position:fixed;top:22px;left:24px;pointer-events:none}
-.logo{color:#00ffff;letter-spacing:4px;font-weight:900;
-text-shadow:0 0 16px #00ffff}
-#score{font-size:30px;font-weight:800}
-#hint{color:#a6aecf;font-size:13px}
-#overlay{position:fixed;inset:0;display:grid;place-items:center;
-background:#03051099;backdrop-filter:blur(5px)}
-.panel{width:min(430px,90vw);padding:32px;text-align:center;
-border:1px solid #00ffff88;background:#080b20ee;
-box-shadow:0 0 60px #00ffff20;border-radius:20px}
-h1{font-size:38px;margin:0;color:#00ffff;text-shadow:3px 3px #ff168b}
-p{line-height:1.8;color:#c2c8e4}
-button{cursor:pointer;border:1px solid #00ffff;background:#00ffff18;
-color:#fff;border-radius:10px;font:700 18px system-ui;
-padding:13px 25px;touch-action:manipulation}
-button:hover{background:#00ffff44}
-#controls{position:fixed;bottom:24px;left:0;right:0;
-display:flex;justify-content:space-between;padding:0 25px;
-pointer-events:none}
-#controls button{pointer-events:auto;width:80px;height:64px;
-background:#080b20bb;font-size:28px;user-select:none}
-#credit{position:fixed;right:20px;top:24px;color:#ff48ae;
-font-size:12px;letter-spacing:2px}
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;
+  background:#030811;color:white;font-family:system-ui,sans-serif
+}
+canvas{display:block;touch-action:none}
+#hud{
+  position:fixed;left:24px;top:22px;
+  pointer-events:none;text-shadow:0 2px 10px #000
+}
+#hud strong{color:#8fffff;letter-spacing:4px;font-size:20px}
+#hud small{display:block;color:#bac8d7;margin-top:7px}
+#cross{
+  position:fixed;left:50%;top:50%;width:4px;height:4px;
+  background:#cfffff;border-radius:50%;pointer-events:none
+}
+#shade{
+  position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse,transparent 45%,#0008)
+}
+#overlay{
+  position:fixed;inset:0;display:grid;place-items:center;
+  background:#020713b3;backdrop-filter:blur(8px);z-index:5
+}
+.panel{
+  width:min(460px,90vw);padding:32px;border:1px solid #46efff66;
+  border-radius:18px;background:#08111de8;text-align:center;
+  box-shadow:0 0 70px #00ddff15
+}
+.tag{font-size:12px;color:#ff75b6;letter-spacing:5px}
+h1{font-size:42px;line-height:1.05;letter-spacing:3px;color:#8effff}
+p{color:#bdcbd9;line-height:1.9}
+button{
+  color:#dfffff;border:1px solid #73faff88;background:#103b4c;
+  padding:13px 23px;border-radius:9px;font:600 16px system-ui;
+  cursor:pointer;touch-action:none
+}
+button:disabled{opacity:.5;cursor:wait}
+#tools{position:fixed;right:16px;top:18px;display:flex;gap:8px}
+#tools button{padding:8px 12px;font-size:12px;background:#081725bb}
+#touch{
+  display:none;position:fixed;bottom:28px;left:22px;
+  grid-template-columns:repeat(3,52px);gap:6px
+}
+#touch button{height:52px;padding:0;background:#0b2839bb}
+#touch button[data-key="KeyW"]{grid-column:2}
+#touch button[data-key="KeyA"]{grid-column:1}
+#lookHint{
+  display:none;position:fixed;bottom:45px;right:24px;
+  color:#a4cbd8;font-size:12px;pointer-events:none
+}
+@media(pointer:coarse){
+  #touch{display:grid}
+  #lookHint{display:block}
+  #hud strong{font-size:15px}
+  #hud small{font-size:10px}
+}
 </style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 <body>
-<canvas id="game"></canvas>
 <div id="hud">
-  <div class="logo">NEON ESCAPE</div>
-  <div id="score">00000</div>
-  <div id="hint">ชิปพลังงาน: 0</div>
+  <strong>NEON DISTRICT</strong>
+  <small>SECTOR 07 / RAIN WALK / 02:14 AM</small>
+  <small id="position">ตรอกเมืองนีออน</small>
 </div>
-<div id="credit">SECTOR // 07</div>
-<div id="controls">
-  <button id="left" aria-label="เลื่อนไปซ้าย">←</button>
-  <button id="right" aria-label="เลื่อนไปขวา">→</button>
+<div id="cross"></div>
+<div id="shade"></div>
+<div id="tools">
+  <button id="quality">แสง Bloom: เปิด</button>
+  <button id="reset">กลับจุดเริ่ม</button>
 </div>
+<div id="touch">
+  <button data-key="KeyW">▲</button>
+  <button data-key="KeyA">◀</button>
+  <button data-key="KeyS">▼</button>
+  <button data-key="KeyD">▶</button>
+</div>
+<div id="lookHint">ลากบนฉากเพื่อมอง</div>
 <div id="overlay">
   <div class="panel">
-    <h1 id="title">NEON ESCAPE</h1>
-    <p id="message">หลบกำแพงสีชมพู เก็บชิปสีฟ้า<br>
-    แล้วหนีออกจากเมืองนีออนให้ไกลที่สุด<br>
-    ใช้ ← → หรือ A / D เพื่อเปลี่ยนเลน</p>
-    <button id="start">เริ่มวิ่ง ⚡</button>
+    <div class="tag">A CYBERPUNK NIGHT WALK</div>
+    <h1>NEON<br>DISTRICT</h1>
+    <p>ไม่มีภารกิจ ไม่มีเวลาจำกัด<br>แค่เดินหลงเข้าไปในเมืองที่ไม่เคยหลับ</p>
+    <p>W A S D — เดิน / เมาส์ — มอง<br>
+    Shift — เดินเร็ว / Esc — ปล่อยเมาส์<br>
+    มือถือ: ปุ่มลูกศร + ลากหน้าจอ</p>
+    <button id="start" disabled>กำลังสร้างเมือง…</button>
+    <p id="status" style="font-size:12px">กำลังโหลดระบบ 3D</p>
   </div>
 </div>
+
 <script>
-"use strict";
-const canvas = document.querySelector("#game");
-const ctx = canvas.getContext("2d");
-const scoreEl = document.querySelector("#score");
-const hintEl = document.querySelector("#hint");
-const overlay = document.querySelector("#overlay");
+window.addEventListener("error", function () {
+  const el = document.getElementById("status");
+  if (el) el.textContent =
+    "โหลดไม่สำเร็จ ลองรีเฟรช และตรวจว่าเครือข่ายอนุญาต jsdelivr.net";
+});
+</script>
 
-let W, H, DPR, focal;
-function resize(){
-  W = innerWidth;
-  H = innerHeight;
-  DPR = Math.min(devicePixelRatio || 1, 2);
-  canvas.width = W * DPR;
-  canvas.height = H * DPR;
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  focal = Math.min(W * .9, H * .95);
-}
-addEventListener("resize", resize);
-resize();
+<script type="module">
+import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { Reflector } from "three/addons/objects/Reflector.js";
 
-let running = false, lane = 0, playerX = 0;
-let distance = 0, chips = 0, speed = 24;
-let objects = [], spawnTimer = 0, last = 0, clock = 0;
-let flash = 0;
-const lanes = [-2.4, 0, 2.4];
-const playerZ = 7;
+const $ = s => document.querySelector(s);
+const mobile = matchMedia("(pointer:coarse)").matches;
 const rand = (a,b) => a + Math.random() * (b-a);
 
-// World-space geometry projected through a perspective camera.
-function project(x,y,z){
-  const scale = focal / Math.max(.15,z);
-  return {x:W/2 + x*scale, y:H*.34 + (3.2-y)*scale};
-}
-function polygon(points, fill, stroke, glow=0){
-  ctx.beginPath();
-  points.forEach((p,i) => i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle = fill;
-  ctx.fill();
-  if(stroke){
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = 1.3;
-    ctx.shadowColor = stroke;
-    ctx.shadowBlur = glow;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-  }
-}
-function line(a,b,color,width=1){
-  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
-  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();
-}
-function box(x,y,z,w,h,d,color){
-  if(z-d/2 <= .2) return;
-  const v = [
-    [x-w/2,y,z-d/2],[x+w/2,y,z-d/2],
-    [x+w/2,y+h,z-d/2],[x-w/2,y+h,z-d/2],
-    [x-w/2,y,z+d/2],[x+w/2,y,z+d/2],
-    [x+w/2,y+h,z+d/2],[x-w/2,y+h,z+d/2]
-  ];
-  const faces = [
-    {ids:[4,5,6,7],fill:"#080d22"},
-    {ids:[0,4,7,3],fill:"#11162e"},
-    {ids:[1,5,6,2],fill:"#10132a"},
-    {ids:[3,2,6,7],fill:"#202844"},
-    {ids:[0,1,2,3],fill:"#0b1025"}
-  ];
-  faces.sort((a,b) =>
-    b.ids.reduce((s,i)=>s+v[i][2],0) -
-    a.ids.reduce((s,i)=>s+v[i][2],0));
-  ctx.globalAlpha = Math.max(.08, Math.min(1,(150-z)/45));
-  for(const f of faces){
-    polygon(f.ids.map(i=>project(...v[i])),f.fill,color,5);
-  }
-  ctx.globalAlpha=1;
-}
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#07131d");
+scene.fog = new THREE.FogExp2("#102333", .027);
 
-const buildings = [];
-for(let i=0;i<48;i++){
-  const side = i%2 ? 1 : -1;
-  buildings.push({
-    x:side*rand(6.5,17), z:rand(3,145),
-    w:rand(2,4.5), h:rand(5,21), d:rand(3,7),
-    color:Math.random()<.5 ? "#087c9c" : "#912a88"
-  });
-}
-const stars = Array.from({length:75},()=>({
-  x:Math.random(), y:Math.random()*.34, a:rand(.2,.8)
-}));
+const camera = new THREE.PerspectiveCamera(
+  70, innerWidth / innerHeight, .1, 180
+);
+camera.rotation.order = "YXZ";
+camera.position.set(0, 1.7, 12);
 
-function move(dir){
-  if(running) lane = Math.max(-1,Math.min(1,lane+dir));
-}
-document.querySelector("#left").onpointerdown = ()=>move(-1);
-document.querySelector("#right").onpointerdown = ()=>move(1);
-addEventListener("keydown",e=>{
-  if(["ArrowLeft","ArrowRight"," "].includes(e.key)) e.preventDefault();
-  if(e.repeat) return;
-  const k=e.key.toLowerCase();
-  if(k==="arrowleft" || k==="a") move(-1);
-  if(k==="arrowright" || k==="d") move(1);
-  if(k===" " && !running) start();
+const renderer = new THREE.WebGLRenderer({
+  antialias: !mobile,
+  powerPreference: "high-performance"
 });
-function start(){
-  running=true;lane=0;playerX=0;distance=0;chips=0;
-  speed=24;objects=[];spawnTimer=.5;flash=0;
-  overlay.style.display="none";
-}
-document.querySelector("#start").onclick=start;
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1 : 1.5));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+document.body.prepend(renderer.domElement);
 
-function end(){
-  running=false;
-  document.querySelector("#title").textContent="SIGNAL LOST";
-  document.querySelector("#message").textContent =
-    `ได้ ${Math.floor(distance+chips*100)} คะแนน • เก็บชิป ${chips} ชิ้น — ลองหนีอีกครั้งไหม?`;
-  document.querySelector("#start").textContent="เริ่มใหม่ ↻";
-  overlay.style.display="grid";
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(
+  new THREE.Vector2(innerWidth, innerHeight), .65, .5, 1
+);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight("#8caed4", "#101021", 1.25));
+const moon = new THREE.DirectionalLight("#739bb9", 1.8);
+moon.position.set(-12, 35, 8);
+scene.add(moon);
+
+const cube = new THREE.BoxGeometry(1,1,1);
+const obstacles = [];
+
+function material(color, metalness=.25, roughness=.7) {
+  return new THREE.MeshStandardMaterial({color, metalness, roughness});
 }
-function spawn(){
-  // One barrier per wave leaves two lanes open.
-  const blocked = Math.floor(Math.random()*3);
-  objects.push({x:lanes[blocked],z:115,type:"wall",done:false});
-  if(Math.random()<.8){
-    const free = [0,1,2].filter(i=>i!==blocked);
-    const index=free[Math.floor(Math.random()*free.length)];
-    objects.push({x:lanes[index],z:115,type:"chip",done:false});
-  }
+const concrete = material("#17212c");
+const dark = material("#090e17");
+const steel = material("#293b45", .8, .35);
+const sidewalk = material("#293138", .2, .6);
+const pink = new THREE.MeshStandardMaterial({
+  color:"#ff2b96", emissive:"#ff1680", emissiveIntensity:3
+});
+const cyan = new THREE.MeshStandardMaterial({
+  color:"#27ecff", emissive:"#12dfff", emissiveIntensity:3
+});
+const amber = new THREE.MeshStandardMaterial({
+  color:"#ffc27b", emissive:"#ff9844", emissiveIntensity:2
+});
+
+function box(x,y,z,w,h,d,mat,solid=false) {
+  const mesh = new THREE.Mesh(cube, mat);
+  mesh.position.set(x,y,z);
+  mesh.scale.set(w,h,d);
+  scene.add(mesh);
+  if(solid) obstacles.push({
+    x1:x-w/2, x2:x+w/2, z1:z-d/2, z2:z+d/2
+  });
+  return mesh;
 }
-function update(dt){
-  const travel = running ? speed*dt : 5*dt;
-  for(const b of buildings){
-    b.z-=travel;
-    if(b.z< -8) b.z+=153;
-  }
-  flash=Math.max(0,flash-dt*3);
-  if(!running) return;
-  distance+=travel;
-  speed=Math.min(52,24+distance*.009);
-  playerX+=(lane*2.4-playerX)*Math.min(1,dt*16);
-  spawnTimer-=dt;
-  if(spawnTimer<=0){
-    spawn();
-    spawnTimer=rand(.9,1.25);
-  }
-  for(const o of objects){
-    const previous=o.z;
-    o.z-=travel;
-    if(o.type==="wall"){
-      const inDepth = o.z<=playerZ+.95 && previous>=playerZ-.95;
-      if(inDepth && Math.abs(o.x-playerX)<1.12){
-        end();
-        break;
-      }
-    }else if(!o.done && o.z<=playerZ+.7 && previous>=playerZ-.7){
-      if(Math.abs(o.x-playerX)<.9){
-        o.done=true;chips++;flash=.65;
+
+function pipe(points, radius=.04, mat=steel) {
+  const curve = new THREE.CatmullRomCurve3(
+    points.map(p=>new THREE.Vector3(...p))
+  );
+  const mesh = new THREE.Mesh(
+    new THREE.TubeGeometry(curve,24,radius,5,false), mat
+  );
+  scene.add(mesh);
+  return mesh;
+}
+
+// Dark ground, reflective road and raised-looking sidewalks.
+box(0,-.13,-39,45,.2,125,dark);
+box(-5.1,-.015,-39,1.8,.16,120,sidewalk);
+box(5.1,-.015,-39,1.8,.16,120,sidewalk);
+
+const road = new Reflector(new THREE.PlaneGeometry(8.4,120), {
+  clipBias:.003,
+  textureWidth:mobile ? 256 : 768,
+  textureHeight:mobile ? 256 : 768,
+  color:0x343d47
+});
+road.rotation.x = -Math.PI/2;
+road.position.set(0,-.02,-39);
+scene.add(road);
+
+// Broken paint, drains and slabs interrupt the smooth reflection.
+for(let z=18;z>-98;z-=4) {
+  box(-4.1,.012,z,.06,.016,1.5,amber);
+  box(4.1,.012,z,.06,.016,1.5,amber);
+  box(0,-.005,z,8,.012,.045,dark);
+}
+for(let z=9;z>-95;z-=12) {
+  box(-3.65,.008,z,.65,.025,1.5,steel);
+  for(let j=0;j<6;j++)
+    box(-3.65,.026,z-.6+j*.24,.56,.015,.06,dark);
+}
+
+// Reusable neon sign texture.
+function sign(text, subtitle, x,y,z,w,h,color,rotation=0) {
+  const canvas = document.createElement("canvas");
+  canvas.width=1024;
+  canvas.height=256;
+  const c=canvas.getContext("2d");
+  c.fillStyle="#070e18";
+  c.fillRect(0,0,1024,256);
+  c.strokeStyle=color;
+  c.lineWidth=8;
+  c.strokeRect(8,8,1008,240);
+  c.textAlign="center";
+  c.shadowColor=color;
+  c.shadowBlur=14;
+  c.fillStyle=color;
+  c.font="900 108px sans-serif";
+  c.fillText(text,512,137);
+  c.shadowBlur=0;
+  c.font="26px monospace";
+  c.fillStyle="#d4e9f0";
+  c.fillText(subtitle,512,211);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace=THREE.SRGBColorSpace;
+  const mat=new THREE.MeshBasicMaterial({
+    map:texture,
+    color:new THREE.Color().setRGB(1.8,1.8,1.8),
+    side:THREE.DoubleSide
+  });
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);
+  mesh.position.set(x,y,z);
+  mesh.rotation.y=rotation;
+  scene.add(mesh);
+  return mesh;
+}
+
+// Windows are instanced to keep the draw-call count lower.
+const windows = [];
+const names = [
+  ["NOODLE LAB","HOT FOOD / OPEN ALL NIGHT"],
+  ["HOTEL 09","SLEEP PODS / VACANCY"],
+  ["SYNAPSE","MEMORY REPAIR / WALK IN"],
+  ["AFTERLIFE","MUSIC / DRINKS / NO SIGNAL"],
+  ["NIGHT MARKET","SECTOR 07 / LOCAL GOODS"],
+  ["ARCADE","INSERT COIN / ESCAPE REALITY"]
+];
+
+for(let i=0;i<13;i++) {
+  const z=12-i*8.5;
+  for(const side of [-1,1]) {
+    const height=rand(15,34);
+    const mat=material(side===-1 ? "#172631" : "#25232e");
+    box(side*8.1,height/2,z,5,height,8.2,mat);
+
+    // Storefronts, shutters and awnings.
+    box(side*5.54,2,z,.15,3.6,6.8,dark);
+    box(side*5.13,3.9,z,1.1,.18,7,steel);
+    for(let k=0;k<7;k++)
+      box(side*5.43,.45+k*.4,z,.08,.045,6.3,steel);
+
+    // Structural vertical strips.
+    box(side*5.47,height/2,z-3.8,.18,height,.22,steel);
+
+    for(let floor=5;floor<height-1;floor+=2.3) {
+      for(let k=0;k<3;k++) {
+        if(Math.random()<.28) continue;
+        windows.push({
+          x:side*5.57,y:floor,z:z-2.6+k*2.5,
+          color:Math.random()<.28 ? "#ffb37b" : "#6ec5d9"
+        });
       }
     }
+
+    if(i%2===0) {
+      const label=names[(i+(side===1?1:0))%names.length];
+      sign(label[0],label[1],side*5.37,4.9,z,5.8,1.45,
+        side===1 ? "#ff50b6" : "#42eeff",
+        side===1 ? -Math.PI/2 : Math.PI/2);
+    }
+
+    // Air-conditioning units.
+    if(i%2===1) {
+      box(side*5.15,6.5,z,1,.85,1.5,steel);
+      box(side*4.62,6.5,z,.02,.6,1.15,dark);
+    }
   }
-  objects=objects.filter(o=>o.z>1 && !o.done);
-  scoreEl.textContent=String(Math.floor(distance+chips*100)).padStart(5,"0");
-  hintEl.textContent=`ชิปพลังงาน: ${chips} • ความเร็ว: ${Math.round(speed)}`;
 }
-function draw(){
-  const bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,"#030510");
-  bg.addColorStop(.48,"#160b30");
-  bg.addColorStop(1,"#030612");
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
-  for(const s of stars){
-    ctx.globalAlpha=s.a;
-    ctx.fillStyle="#b2d9ff";ctx.fillRect(s.x*W,s.y*H,1.5,1.5);
+const winMat = new THREE.MeshBasicMaterial();
+const winMesh = new THREE.InstancedMesh(cube,winMat,windows.length);
+const dummy = new THREE.Object3D();
+windows.forEach((w,i)=>{
+  dummy.position.set(w.x,w.y,w.z);
+  dummy.scale.set(.035,.85,1.15);
+  dummy.updateMatrix();
+  winMesh.setMatrixAt(i,dummy.matrix);
+  winMesh.setColorAt(i,new THREE.Color(w.color).multiplyScalar(1.6));
+});
+winMesh.instanceMatrix.needsUpdate=true;
+scene.add(winMesh);
+
+// Distant towers closing the skyline, not the walking space.
+for(let i=0;i<14;i++) {
+  const h=rand(25,65);
+  box(rand(-32,32),h/2,-113-rand(0,15),rand(3,7),h,5,concrete);
+}
+
+// Overhead walkways.
+for(const z of [-16,-56,-87]) {
+  box(0,8.5,z,11.5,.5,2.2,steel);
+  box(0,10.3,z,11.5,.3,2.4,dark);
+  for(let x=-5;x<=5;x+=1)
+    box(x,9.4,z+.98,.08,1.6,.08,steel);
+  box(0,8.25,z+1.12,10,.055,.07,cyan);
+}
+sign("NEON DISTRICT","WELCOME TO SECTOR 07",0,7.1,-17,7,1.7,"#42eeff");
+sign("NO SIGNAL","BEYOND THIS POINT",0,6,-93,5.5,1.5,"#ff50b6");
+
+// Sagging overhead cables.
+for(let i=0;i<16;i++) {
+  const z=10-i*6.6;
+  pipe([[-5.6,12,z],[-2,10.5,z+.6],[2,10.1,z-.3],[5.6,13,z]],.025,dark);
+}
+for(const side of [-1,1]) {
+  pipe([[side*5.28,.2,15],[side*5.28,7,15],
+        [side*5.28,7,-95]],.095,steel);
+}
+
+// Benches, bins, vending machines and small barriers.
+for(let i=0;i<8;i++) {
+  const z=4-i*13;
+  const side=i%2 ? -1 : 1;
+
+  box(side*4.85,1.25,z,1.05,2.5,1.15,steel,true);
+  box(side*4.85,1.53,z+.59,.78,1.4,.035,i%2?cyan:pink);
+  box(side*4.85,.43,z+.61,.7,.25,.04,dark);
+  sign("24H","DRINK / RECHARGE",side*4.85,2.83,z+.62,
+       1.2,.4,i%2?"#42eeff":"#ff50b6");
+
+  const bx=-side*4.7;
+  box(bx,.5,z-3,1.1,.18,2.2,steel,true);
+  box(bx-side*.43,.95,z-3,.15,.95,2.2,concrete);
+  box(bx,.23,z-3.8,.65,.46,.15,dark);
+  box(bx,.23,z-2.2,.65,.46,.15,dark);
+
+  box(side*4.8,.42,z-5,.65,.84,.65,concrete,true);
+}
+
+// Main neon fixtures and limited local lights.
+for(let i=0;i<5;i++) {
+  const z=7-i*23;
+  const side=i%2 ? -1 : 1;
+  box(side*4.95,3.2,z,.08,2.4,.08,i%2?cyan:pink);
+  const light=new THREE.PointLight(i%2?0x26dbff:0xff309a,36,15,2);
+  light.position.set(side*3.8,3.2,z);
+  scene.add(light);
+}
+
+// End barrier.
+box(0,1.2,-99,11.4,2.4,.5,steel);
+sign("END OF SECTOR","TURN BACK / CITY UNDER CONSTRUCTION",
+     0,2.4,-98.7,5,1.25,"#ffc278");
+
+// Rain as short line segments.
+const rainCount=mobile?550:1300;
+const rainArray=new Float32Array(rainCount*6);
+for(let i=0;i<rainCount;i++) {
+  const n=i*6;
+  rainArray[n]=rand(-5.4,5.4);
+  rainArray[n+1]=rand(0,22);
+  rainArray[n+2]=rand(-100,20);
+  rainArray[n+3]=rainArray[n]+.025;
+  rainArray[n+4]=rainArray[n+1]-.22;
+  rainArray[n+5]=rainArray[n+2];
+}
+const rainGeo=new THREE.BufferGeometry();
+rainGeo.setAttribute("position",new THREE.BufferAttribute(rainArray,3));
+const rain=new THREE.LineSegments(rainGeo,
+  new THREE.LineBasicMaterial({
+    color:"#8fb6ca",transparent:true,opacity:.3,depthWrite:false
+  })
+);
+rain.frustumCulled=false;
+scene.add(rain);
+
+// Walking controls.
+const keys={};
+let started=false;
+let yaw=0, pitch=0, walkingTime=0;
+let drag=null;
+
+function clearKeys(){
+  for(const k in keys) delete keys[k];
+}
+function look(dx,dy){
+  yaw-=dx*.0022;
+  pitch=THREE.MathUtils.clamp(pitch-dy*.0022,-1.35,1.35);
+}
+function setCameraRotation(){
+  camera.rotation.set(pitch,yaw,0);
+}
+async function enter(){
+  started=true;
+  $("#overlay").style.display="none";
+  if(!mobile && renderer.domElement.requestPointerLock) {
+    try {
+      await renderer.domElement.requestPointerLock();
+    } catch {
+      $("#position").textContent="ลากเมาส์บนฉากเพื่อมอง / WASD เพื่อเดิน";
+    }
   }
-  ctx.globalAlpha=1;
+}
+$("#start").onclick=enter;
 
-  const moon=project(0,12,85);
-  ctx.shadowBlur=35;ctx.shadowColor="#ff168b";
-  ctx.fillStyle="#ff168b";
-  ctx.beginPath();ctx.arc(moon.x,moon.y,focal*.075,0,Math.PI*2);ctx.fill();
-  ctx.shadowBlur=0;
-
-  polygon([
-    project(-4,0,150),project(4,0,150),
-    project(4,0,1),project(-4,0,1)
-  ],"#060a19");
-
-  for(const x of [-4,-1.2,1.2,4]){
-    line(project(x,.01,1),project(x,.01,150),
-      Math.abs(x)===4 ? "#ff168b" : "#075069",Math.abs(x)===4 ? 2 : 1);
+document.addEventListener("pointerlockchange",()=>{
+  clearKeys();
+  if(!document.pointerLockElement && !mobile && started) {
+    started=false;
+    $("#overlay").style.display="grid";
+    $("#start").textContent="กลับเข้าเมือง";
   }
-  const offset=(distance+clock*(!running ? 5 : 0))%6;
-  for(let z=6-offset;z<150;z+=6){
-    if(z>1) line(project(-4,.01,z),project(4,.01,z),"#113449");
-  }
+});
 
-  const renderables=buildings.map(b=>({...b,kind:"building"}));
-  for(const o of objects) renderables.push({...o,kind:o.type});
-  renderables.push({x:playerX,z:playerZ,kind:"player"});
-  renderables.sort((a,b)=>b.z-a.z);
+document.addEventListener("mousemove",e=>{
+  if(document.pointerLockElement===renderer.domElement)
+    look(e.movementX,e.movementY);
+});
 
-  for(const r of renderables){
-    if(r.kind==="building"){
-      box(r.x,0,r.z,r.w,r.h,r.d,r.color);
-      const front=r.z-r.d/2-.02;
-      if(front>.2){
-        for(let y=1.5;y<r.h-1;y+=2){
-          line(project(r.x-r.w*.32,y,front),
-            project(r.x+r.w*.32,y,front),r.color,2);
-        }
-      }
-    }else if(r.kind==="wall"){
-      box(r.x,0,r.z,1.65,1.65,1.1,"#ff237c");
-      if(r.z>.8){
-        line(project(r.x-.6,.2,r.z-.57),
-          project(r.x+.6,1.45,r.z-.57),"#ffb4d7",3);
-        line(project(r.x+.6,.2,r.z-.57),
-          project(r.x-.6,1.45,r.z-.57),"#ffb4d7",3);
-      }
-    }else if(r.kind==="chip"){
-      box(r.x,.8+Math.sin(clock*5)*.15,r.z,.55,.55,.55,"#00ffff");
+renderer.domElement.addEventListener("pointerdown",e=>{
+  if(!started || document.pointerLockElement) return;
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY};
+  renderer.domElement.setPointerCapture(e.pointerId);
+});
+renderer.domElement.addEventListener("pointermove",e=>{
+  if(!drag || drag.id!==e.pointerId) return;
+  look(e.clientX-drag.x,e.clientY-drag.y);
+  drag.x=e.clientX;
+  drag.y=e.clientY;
+});
+function stopDrag(e){
+  if(drag?.id===e.pointerId) drag=null;
+}
+renderer.domElement.addEventListener("pointerup",stopDrag);
+renderer.domElement.addEventListener("pointercancel",stopDrag);
+
+document.addEventListener("keydown",e=>{
+  if(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowDown",
+      "ArrowLeft","ArrowRight","Space"].includes(e.code))
+    e.preventDefault();
+  if(started) keys[e.code]=true;
+});
+document.addEventListener("keyup",e=>{keys[e.code]=false});
+addEventListener("blur",clearKeys);
+document.addEventListener("visibilitychange",clearKeys);
+
+document.querySelectorAll("[data-key]").forEach(button=>{
+  button.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    if(!started) return;
+    button.setPointerCapture(e.pointerId);
+    keys[button.dataset.key]=true;
+  });
+  const release=()=>{keys[button.dataset.key]=false};
+  button.addEventListener("pointerup",release);
+  button.addEventListener("pointercancel",release);
+  button.addEventListener("lostpointercapture",release);
+});
+
+$("#reset").onclick=()=>{
+  camera.position.set(0,1.7,12);
+  yaw=0;pitch=0;
+  clearKeys();
+};
+$("#quality").onclick=()=>{
+  bloom.enabled=!bloom.enabled;
+  $("#quality").textContent=`แสง Bloom: ${bloom.enabled?"เปิด":"ปิด"}`;
+};
+
+function blocked(x,z){
+  const r=.28;
+  if(x < -5.25 || x > 5.25 || z < -97.8 || z > 18) return true;
+  return obstacles.some(o=>
+    x+r>o.x1 && x-r<o.x2 && z+r>o.z1 && z-r<o.z2
+  );
+}
+
+let previous=performance.now();
+function frame(now){
+  const dt=Math.min((now-previous)/1000,.04);
+  previous=now;
+
+  if(started){
+    let forward=Number(!!(keys.KeyW||keys.ArrowUp))-
+                Number(!!(keys.KeyS||keys.ArrowDown));
+    let side=Number(!!(keys.KeyD||keys.ArrowRight))-
+             Number(!!(keys.KeyA||keys.ArrowLeft));
+    const length=Math.hypot(forward,side);
+    if(length){
+      forward/=length;
+      side/=length;
+      const speed=(keys.ShiftLeft||keys.ShiftRight)?5.3:3;
+      const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*side)*speed*dt;
+      const dz=(-Math.cos(yaw)*forward-Math.sin(yaw)*side)*speed*dt;
+
+      if(!blocked(camera.position.x+dx,camera.position.z))
+        camera.position.x+=dx;
+      if(!blocked(camera.position.x,camera.position.z+dz))
+        camera.position.z+=dz;
+      walkingTime+=dt*9;
+      camera.position.y=1.7+Math.sin(walkingTime)*.025;
     }else{
-      const bob=Math.sin(clock*14)*.035;
-      box(r.x,.15+bob,r.z,.65,.4,1.05,"#00ffff");
-      box(r.x,.55+bob,r.z,.4,.45,.5,"#c75cff");
-      const p=project(r.x,.2,r.z-.7);
-      ctx.shadowColor="#00ffff";ctx.shadowBlur=20;
-      ctx.fillStyle="#baffff";
-      ctx.fillRect(p.x-9,p.y,18,4);
-      ctx.shadowBlur=0;
+      camera.position.y=THREE.MathUtils.lerp(camera.position.y,1.7,.1);
     }
   }
+  setCameraRotation();
 
-  // Subtle scanlines.
-  ctx.fillStyle="#00000018";
-  for(let y=0;y<H;y+=4) ctx.fillRect(0,y,W,1);
-  if(flash>0){
-    ctx.fillStyle=`rgba(0,255,255,${flash*.18})`;
-    ctx.fillRect(0,0,W,H);
+  for(let i=0;i<rainCount;i++){
+    const n=i*6;
+    rainArray[n+1]-=dt*11;
+    if(rainArray[n+1]<0) rainArray[n+1]=22;
+    rainArray[n+4]=rainArray[n+1]-.22;
   }
-}
-function frame(time){
-  const dt=Math.min((time-last)/1000 || 0,.04);
-  last=time;clock+=dt;
-  update(dt);draw();
+  rainGeo.attributes.position.needsUpdate=true;
+  composer.render();
   requestAnimationFrame(frame);
 }
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+  composer.setSize(innerWidth,innerHeight);
+});
+
+$("#start").disabled=false;
+$("#start").textContent="เข้าเมือง";
+$("#status").textContent=
+  mobile ? "มือถือ: กดลูกศรเพื่อเดิน ลากบนฉากเพื่อมอง" :
+           "คลิกเข้าเมืองเพื่อใช้เมาส์มองไปรอบ ๆ";
 requestAnimationFrame(frame);
 </script>
 </body>
