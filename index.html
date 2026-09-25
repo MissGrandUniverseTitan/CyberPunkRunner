@@ -2,8 +2,9 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AFTERLIGHT — ตรอกอุ่นไอ</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AFTERLIGHT — ตรอกนิรันดร์</title>
+<meta name="application-version" content="2.2.0">
 
 <style>
 :root {
@@ -230,6 +231,29 @@ kbd {
   margin-top: 15px;
   line-height: 1.8;
 }
+#portrait {
+  position: absolute;
+  right: 32px;
+  bottom: 84px;
+  pointer-events: auto;
+  padding: 10px 16px;
+  border: 1px solid #ddbb8566;
+  border-radius: 24px;
+  background: #14201ee8;
+  color: var(--cream);
+  font-size: 12px;
+}
+#portrait:hover, #portrait[aria-pressed="true"] {
+  background: #ddbb85;
+  color: #17201a;
+}
+button:focus-visible {
+  outline: 2px solid #ffe1a8;
+  outline-offset: 5px;
+}
+@media(max-width:650px) {
+  #portrait { right: 18px; bottom: 118px; }
+}
 .clean #hud {
   visibility: hidden;
 }
@@ -263,6 +287,7 @@ kbd {
   }
 }
 </style>
+<link rel="stylesheet" href="./assets/mobile.css?v=2.2.0">
 
 <script type="importmap">
 {
@@ -279,15 +304,18 @@ kbd {
   <div class="intro">
     <div class="eyebrow">A SMALL PLACE, STILL ALIVE</div>
     <h2>AFTERLIGHT</h2>
-    <div class="subtitle">ตรอกอุ่นไอ</div>
+    <div class="subtitle">ตรอกนิรันดร์</div>
+    <div class="save-note">เวอร์ชัน 2.2.0</div>
     <p>
       เมืองหลับไปแล้ว แต่ร้านซ่อมท้ายตรอกยังเปิดไฟอยู่<br>
       เป็นแมวสามสีสักคืน เดินตามเสียงวิทยุ<br>
       ปีนขึ้นไปดูหลังคา แล้วหาที่อุ่น ๆ พักเท้า
     </p>
     <button id="play" disabled>กำลังเตรียมตรอก…</button>
-    <div id="status">
-      กำลังโหลดฉาก • ใช้คีย์บอร์ดและเมาส์บนคอมพิวเตอร์
+    <button id="new-game" type="button" hidden>เริ่มใหม่</button>
+    <div class="save-note">เซฟอัตโนมัติในเครื่องและเบราว์เซอร์นี้ • ล้างข้อมูลเว็บไซต์จะลบเซฟ</div>
+    <div id="status" role="status">
+      กำลังโหลดฉากและน้องแมว…
     </div>
   </div>
 </div>
@@ -296,26 +324,38 @@ kbd {
   <div class="brand">
     <div class="eyebrow">OLD DISTRICT / 03:17</div>
     <h1>AFTERLIGHT</h1>
-    <div class="subtitle">ตรอกอุ่นไอ</div>
+    <div class="subtitle">ตรอกนิรันดร์</div>
   </div>
 
   <div class="progress">
     <div>เรื่องเล่าในตรอก <span id="counter">0 / 4</span></div>
     <div id="dots">○○○○</div>
-    <div style="color:#a8b5a2">J · เปิดสมุดบันทึก</div>
+    <div class="keyboard-only" style="color:#a8b5a2">J · เปิดสมุดบันทึก</div>
+    <div id="save-state" role="status">ยังไม่ได้เริ่มเล่น</div>
   </div>
 
-  <div id="toast"></div>
+  <details id="game-menu" hidden>
+    <summary>เมนู</summary><div class="menu-panel">
+      <button data-action="save">บันทึกตอนนี้</button>
+      <button data-action="journal">สมุดบันทึก</button>
+      <button data-action="portrait">มองน้องใกล้ ๆ</button>
+      <button data-action="zoom-in">ซูมเข้า</button>
+      <button data-action="zoom-out">ซูมออก</button>
+      <button data-action="reset">กลับทางเข้า</button>
+    </div>
+  </details>
+  <div id="toast" role="status"></div>
   <div id="area">ทางเข้าตรอก</div>
   <div id="hint"></div>
 
   <div id="dialog">
     <div id="speaker"></div>
     <div id="line"></div>
-    <div id="next">E · อ่านต่อ / ปิด &nbsp;&nbsp; ESC · ปิด</div>
+    <div class="dialog-actions"><button data-action="interact">อ่านต่อ</button><button data-action="close">ปิด</button><span class="keyboard-only">E · อ่านต่อ / ESC · ปิด</span></div>
   </div>
 
   <div id="journal"></div>
+  <button id="portrait" type="button" aria-pressed="false">C · มองน้องใกล้ ๆ</button>
 
   <div class="controls">
     <span><kbd>WASD</kbd> เดิน</span>
@@ -331,8 +371,23 @@ kbd {
   </div>
 </div>
 
+<div id="mobile-controls" aria-label="ควบคุมเกมด้วยการสัมผัส">
+  <div id="joystick" aria-label="จอยเดิน ลากเพื่อกำหนดทิศทาง"><div id="stick"></div><span id="joystick-label">เดิน</span></div>
+  <div id="mobile-actions">
+    <button data-action="run" id="touch-run" aria-pressed="false">วิ่ง</button>
+    <button data-action="jump">กระโดด</button>
+    <button data-action="meow">เหมียว</button>
+    <button data-action="interact" id="touch-interact">สำรวจ</button>
+    <button data-action="rest" id="touch-rest" aria-pressed="false">พัก</button>
+    <button data-action="portrait" id="touch-portrait" aria-pressed="false">ดูน้อง</button>
+  </div>
+</div>
+<script src="./assets/game-support.js?v=2.2.0"></script>
 <script type="module">
 const $ = selector => document.querySelector(selector);
+const support = window.AfterlightSupport;
+const touchMode = matchMedia('(any-pointer: coarse)').matches;
+document.body.classList.toggle('touch', touchMode);
 
 try {
   const T = await import('three');
@@ -341,48 +396,51 @@ try {
     { EffectComposer },
     { RenderPass },
     { UnrealBloomPass },
-    { OutputPass }
+    { OutputPass },
+    { GLTFLoader }
   ] = await Promise.all([
     import('three/addons/postprocessing/EffectComposer.js'),
     import('three/addons/postprocessing/RenderPass.js'),
     import('three/addons/postprocessing/UnrealBloomPass.js'),
-    import('three/addons/postprocessing/OutputPass.js')
+    import('three/addons/postprocessing/OutputPass.js'),
+    import('three/addons/loaders/GLTFLoader.js')
   ]);
 
   // ============================================================
   // Renderer and atmosphere
   // ============================================================
   const scene = new T.Scene();
-  scene.background = new T.Color('#29312b');
-  scene.fog = new T.FogExp2('#29312b', .032);
+  scene.background = new T.Color('#182b2d');
+  scene.fog = new T.FogExp2('#182b2d', .027);
 
   const renderer = new T.WebGLRenderer({ antialias: true });
   renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.35));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, touchMode ? 1 : 1.35));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = T.PCFSoftShadowMap;
   renderer.toneMapping = T.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.16;
+  renderer.toneMappingExposure = 1.08;
   document.body.prepend(renderer.domElement);
 
   const camera = new T.PerspectiveCamera(
-    56, innerWidth / innerHeight, .07, 100
+    53, innerWidth / innerHeight, .07, 100
   );
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(
+  if (!touchMode) composer.addPass(new UnrealBloomPass(
     new T.Vector2(innerWidth, innerHeight),
-    .28, .55, 1.05
+    .23, .5, 1.15
   ));
   composer.addPass(new OutputPass());
 
-  scene.add(new T.HemisphereLight('#a5bfb4', '#594333', 1.25));
+  scene.add(new T.HemisphereLight('#b4d8e2', '#624638', 1.1));
 
-  const sky = new T.DirectionalLight('#d3dbc3', 2.05);
+  const sky = new T.DirectionalLight('#bfdce7', 1.55);
   sky.position.set(-3, 15, 5);
   sky.castShadow = true;
-  sky.shadow.mapSize.set(2048, 2048);
+  const shadowSize = touchMode ? 1024 : 2048;
+  sky.shadow.mapSize.set(shadowSize, shadowSize);
 
   Object.assign(sky.shadow.camera, {
     left: -10,
@@ -1226,13 +1284,14 @@ try {
   wallLamp(-4.2, 2.27, -6.3);
   wallLamp(4.7, 3.7, 7);
 
-  light(4.7, 3, -2.5, '#81d4b4', 35, 10);
+  light(4.7, 3, -2.5, '#81d4cc', 30, 10);
+  light(-2.5, 2.2, 9.6, '#ffad68', 22, 7);
   light(0, 3.3, -12.7, '#cba05e', 27, 8);
 
   cube(.055, 2, .06, 1.65, 2.3, -13.64, teal);
 
   const shopLight = new T.SpotLight(
-    '#ffd29a', 45, 7, .85, .65, 2
+    '#ffb879', 52, 8, .85, .65, 2
   );
   shopLight.position.set(-3.5, 2.4, -6.4);
   shopLight.target.position.set(-4.1, .2, -6);
@@ -1364,752 +1423,60 @@ try {
   });
 
   // ============================================================
-  // New calico cat
-  // Front direction: -Z
-  // All textures are generated locally.
+  // Calico V2: continuous sculpted meshes with articulated transform joints.
+  // Source generator: tools/build_cat.py. Front direction: -Z, Y up.
+  // The standalone review build embeds the exact same GLB for file:// use.
   // ============================================================
-  function createReferenceCat() {
+  async function createReferenceCat() {
+    const loader = new GLTFLoader();
+    const embedded = document.querySelector('#calico-model');
+    let gltf;
+    if (embedded) {
+      const bytes = Uint8Array.from(atob(embedded.textContent.trim()), c => c.charCodeAt(0));
+      gltf = await loader.parseAsync(bytes.buffer, '');
+    } else {
+      const bytes = await support.loadModelParts('./assets/calico-v2/', '2.2.0');
+      gltf = await loader.parseAsync(bytes.buffer, '');
+    }
+
     const cat = new T.Group();
+    cat.name = 'playerCat';
     cat.position.set(0, 0, 10.5);
+    const catBody = gltf.scene;
+    cat.add(catBody);
     scene.add(cat);
 
-    const catBody = new T.Group();
-    cat.add(catBody);
-
-    // Independent random generator for fur.
-    let furSeed = 78231;
-
-    function rnd() {
-      furSeed = (
-        Math.imul(furSeed, 1664525) + 1013904223
-      ) >>> 0;
-      return furSeed / 4294967296;
+    function joint(name) {
+      const object = catBody.getObjectByName(name);
+      if (!object) throw new Error('Calico model is missing joint: ' + name);
+      return object;
     }
 
-    const smoothSphere = new T.SphereGeometry(1, 32, 24);
-
-    function catMaterial(color, roughness = .85, metalness = 0) {
-      return new T.MeshStandardMaterial({
-        color, roughness, metalness
-      });
-    }
-
-    function addMesh(geometry, mat, parent) {
-      const mesh = new T.Mesh(geometry, mat);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      parent.add(mesh);
-      return mesh;
-    }
-
-    function ball(parent, mat, x, y, z, sx, sy, sz) {
-      const mesh = addMesh(smoothSphere, mat, parent);
-      mesh.position.set(x, y, z);
-      mesh.scale.set(sx, sy, sz);
-      return mesh;
-    }
-
-    function tube(parent, points, radius, mat) {
-      return addMesh(
-        new T.TubeGeometry(
-          new T.CatmullRomCurve3(points),
-          16, radius, 8, false
-        ),
-        mat,
-        parent
-      );
-    }
-
-    // Planar UV projection for predictable facial markings.
-    function frontGeometry() {
-      const geometry = smoothSphere.clone();
-      const positions = geometry.attributes.position;
-      const uv = geometry.attributes.uv;
-
-      for (let i = 0; i < positions.count; i++) {
-        uv.setXY(
-          i,
-          (positions.getX(i) + 1) * .5,
-          (positions.getY(i) + 1) * .5
-        );
-      }
-
-      uv.needsUpdate = true;
-      return geometry;
-    }
-
-    function makeTexture(size, draw) {
-      const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = size;
-      draw(canvas.getContext('2d'), size);
-
-      const texture = new T.CanvasTexture(canvas);
-      texture.colorSpace = T.SRGBColorSpace;
-      texture.anisotropy = Math.min(
-        8, renderer.capabilities.getMaxAnisotropy()
-      );
-
-      return texture;
-    }
-
-    function hairGrain(ctx, n, count) {
-      ctx.lineWidth = Math.max(.55, n / 1200);
-
-      for (let i = 0; i < count; i++) {
-        const x = rnd() * n;
-        const y = rnd() * n;
-
-        ctx.strokeStyle = rnd() > .48
-          ? 'rgba(255,241,215,.13)'
-          : 'rgba(30,18,12,.10)';
-
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(
-          x + (rnd() - .5) * n * .007,
-          y + (2 + rnd() * 5) * n / 512
-        );
-        ctx.stroke();
-      }
-    }
-
-    function plainFur(color) {
-      const texture = makeTexture(256, (ctx, n) => {
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, n, n);
-        hairGrain(ctx, n, 5500);
-      });
-
-      return new T.MeshStandardMaterial({
-        map: texture,
-        roughness: .94
-      });
-    }
-
-    const whiteFur = plainFur('#eee5d5');
-    const orangeFur = plainFur('#bf6c2f');
-    const blackFur = plainFur('#282322');
-
-    // Body: broad irregular orange and black patches.
-    const bodyTexture = makeTexture(512, (ctx, n) => {
-      ctx.fillStyle = '#eee5d5';
-      ctx.fillRect(0, 0, n, n);
-
-      const patches = [
-        [.12, .24, .23, .29, '#282322'],
-        [.37, .34, .20, .30, '#bd692d'],
-        [.68, .24, .22, .26, '#282322'],
-        [.86, .48, .22, .28, '#c67b37'],
-        [.53, .65, .17, .22, '#a95527'],
-        [.18, .77, .18, .15, '#302725']
-      ];
-
-      for (const [cx, cy, rx, ry, color] of patches) {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-
-        for (let j = 0; j <= 64; j++) {
-          const angle = j / 64 * Math.PI * 2;
-          const uneven =
-            1 +
-            .09 * Math.sin(angle * 5 + cx * 13) +
-            .045 * Math.cos(angle * 9);
-
-          const x = (cx + Math.cos(angle) * rx * uneven) * n;
-          const y = (cy + Math.sin(angle) * ry * uneven) * n;
-
-          if (j === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      hairGrain(ctx, n, 22000);
+    catBody.traverse(object => {
+      if (!object.isMesh) return;
+      // Skin motion extends beyond the bind-pose bounds. Only two small tail meshes.
+      if (object.isSkinnedMesh) object.frustumCulled = false;
+      const detail = /fur|Whisker|Brow_hair|Ear_hair|Iris|Pupil|glint|Catchlight|almond_eye|eyelid/i.test(object.name);
+      object.castShadow = !detail;
+      object.receiveShadow = !/Iris|Pupil|glint|Catchlight|almond_eye|eyelid/i.test(object.name);
     });
 
-    const bodyFur = new T.MeshStandardMaterial({
-      map: bodyTexture,
-      roughness: .94
-    });
-
-    // Face: asymmetric calico markings and a white central blaze.
-    const faceTexture = makeTexture(1024, (ctx, n) => {
-      ctx.fillStyle = '#272221';
-      ctx.fillRect(0, 0, n, n);
-
-      ctx.fillStyle = '#c87936';
-      ctx.beginPath();
-      ctx.ellipse(
-        n * .24, n * .49,
-        n * .32, n * .39,
-        -.25, 0, Math.PI * 2
-      );
-      ctx.fill();
-
-      ctx.fillStyle = '#ad592a';
-      ctx.beginPath();
-      ctx.ellipse(
-        n * .66, n * .22,
-        n * .19, n * .29,
-        -.35, 0, Math.PI * 2
-      );
-      ctx.fill();
-
-      ctx.fillStyle = '#302522';
-      ctx.beginPath();
-      ctx.ellipse(
-        n * .055, n * .19,
-        n * .18, n * .29,
-        -.25, 0, Math.PI * 2
-      );
-      ctx.fill();
-
-      ctx.fillStyle = '#eee5d5';
-      ctx.beginPath();
-      ctx.moveTo(n * .49, n * .11);
-
-      ctx.bezierCurveTo(
-        n * .44, n * .24,
-        n * .47, n * .35,
-        n * .40, n * .49
-      );
-      ctx.bezierCurveTo(
-        n * .36, n * .59,
-        n * .23, n * .61,
-        n * .10, n * .73
-      );
-
-      ctx.lineTo(0, n);
-      ctx.lineTo(n, n);
-      ctx.lineTo(n * .94, n * .72);
-
-      ctx.bezierCurveTo(
-        n * .76, n * .62,
-        n * .61, n * .57,
-        n * .57, n * .43
-      );
-      ctx.bezierCurveTo(
-        n * .55, n * .30,
-        n * .54, n * .19,
-        n * .49, n * .11
-      );
-
-      ctx.closePath();
-      ctx.fill();
-
-      hairGrain(ctx, n, 35000);
-    });
-
-    const faceFur = new T.MeshStandardMaterial({
-      map: faceTexture,
-      roughness: .94
-    });
-
-    const innerEarMat = catMaterial('#ae7770', .95);
-    const nosePink = catMaterial('#bd777b', .56);
-    const noseDark = catMaterial('#653c40', .85);
-    const eyeRim = catMaterial('#30271e', .75);
-    const pupilMat = catMaterial('#080c09', .13);
-    const mouthMat = catMaterial('#715b52', .95);
-    const harnessMat = catMaterial('#252b2b', .93);
-    const trimMat = catMaterial('#645648', .83);
-    const metalMat = catMaterial('#a48657', .38, .7);
-
-    // ----------------------------------------------------------
-    // Torso and chest
-    // ----------------------------------------------------------
-    ball(catBody, bodyFur, 0, .57, .055, .245, .25, .45);
-    ball(catBody, bodyFur, 0, .55, .32, .255, .25, .245);
-
-    const chest = ball(
-      catBody, whiteFur,
-      0, .62, -.265, .214, .277, .215
-    );
-    chest.rotation.x = -.12;
-
-    ball(
-      catBody, whiteFur,
-      0, .43, -.10, .185, .135, .31
-    );
-
-    // ----------------------------------------------------------
-    // Head and muzzle
-    // ----------------------------------------------------------
-    const head = new T.Group();
-    head.position.set(0, .79, -.465);
-    catBody.add(head);
-
-    const skull = addMesh(frontGeometry(), faceFur, head);
-    skull.scale.set(.267, .237, .225);
-
-    ball(
-      head, whiteFur,
-      -.113, -.101, -.158, .121, .088, .083
-    );
-    ball(
-      head, whiteFur,
-      .113, -.101, -.158, .121, .088, .083
-    );
-    ball(
-      head, whiteFur,
-      0, -.163, -.16, .119, .056, .082
-    );
-
-    ball(
-      head, whiteFur,
-      -.054, -.085, -.226, .073, .052, .045
-    );
-    ball(
-      head, whiteFur,
-      .054, -.085, -.226, .073, .052, .045
-    );
-
-    const noseShape = new T.Shape();
-    noseShape.moveTo(-.041, .012);
-    noseShape.quadraticCurveTo(0, .025, .041, .012);
-    noseShape.quadraticCurveTo(.034, -.003, .009, -.026);
-    noseShape.quadraticCurveTo(0, -.034, -.009, -.026);
-    noseShape.quadraticCurveTo(-.034, -.003, -.041, .012);
-
-    const noseGeometry = new T.ExtrudeGeometry(noseShape, {
-      depth: .012,
-      bevelEnabled: true,
-      bevelSegments: 3,
-      steps: 1,
-      bevelSize: .004,
-      bevelThickness: .004,
-      curveSegments: 12
-    });
-
-    const nose = addMesh(noseGeometry, nosePink, head);
-    nose.position.set(0, -.053, -.288);
-
-    for (const side of [-1, 1]) {
-      ball(
-        head, noseDark,
-        side * .022, -.056, -.293,
-        .009, .004, .003
-      );
-    }
-
-    tube(head, [
-      V(0, -.079, -.276),
-      V(0, -.102, -.271),
-      V(0, -.112, -.264)
-    ], .0025, mouthMat);
-
-    for (const side of [-1, 1]) {
-      tube(head, [
-        V(0, -.111, -.264),
-        V(side * .028, -.122, -.263),
-        V(side * .054, -.113, -.260)
-      ], .002, mouthMat);
-    }
-
-    // ----------------------------------------------------------
-    // Shaped ears with pink interiors
-    // ----------------------------------------------------------
-    const ears = [];
-
-    for (const side of [-1, 1]) {
-      const ear = new T.Group();
-      ear.position.set(side * .153, .135, .005);
-      ear.rotation.z = -side * .16;
-      ear.userData.baseZ = ear.rotation.z;
-      head.add(ear);
-      ears.push(ear);
-
-      const outline = new T.Shape();
-      outline.moveTo(-.092, -.032);
-      outline.quadraticCurveTo(-.105, .090, -.031, .246);
-      outline.quadraticCurveTo(0, .278, .031, .246);
-      outline.quadraticCurveTo(.105, .090, .092, -.032);
-      outline.quadraticCurveTo(0, -.064, -.092, -.032);
-
-      const outer = addMesh(
-        new T.ExtrudeGeometry(outline, {
-          depth: .045,
-          bevelEnabled: true,
-          bevelSegments: 3,
-          steps: 1,
-          bevelSize: .009,
-          bevelThickness: .008,
-          curveSegments: 16
-        }),
-        side < 0 ? blackFur : orangeFur,
-        ear
-      );
-      outer.position.z = -.014;
-
-      const inset = new T.Shape();
-      inset.moveTo(-.064, -.004);
-      inset.quadraticCurveTo(-.072, .091, -.012, .212);
-      inset.quadraticCurveTo(0, .230, .012, .212);
-      inset.quadraticCurveTo(.072, .091, .064, -.004);
-      inset.quadraticCurveTo(0, -.025, -.064, -.004);
-
-      const lining = innerEarMat.clone();
-      lining.side = T.DoubleSide;
-
-      const inner = addMesh(
-        new T.ShapeGeometry(inset, 16),
-        lining,
-        ear
-      );
-      inner.position.z = -.027;
-      inner.castShadow = false;
-
-      ball(
-        ear, whiteFur,
-        0, -.008, -.035,
-        .056, .025, .013
-      );
-    }
-
-    // ----------------------------------------------------------
-    // Green eyes with amber centers and broad dark pupils
-    // ----------------------------------------------------------
-    const irisTexture = makeTexture(256, (ctx, n) => {
-      const mid = n / 2;
-
-      const gradient = ctx.createRadialGradient(
-        mid, mid, n * .08,
-        mid, mid, n * .5
-      );
-
-      gradient.addColorStop(0, '#b89b35');
-      gradient.addColorStop(.34, '#a7ac36');
-      gradient.addColorStop(.66, '#708e35');
-      gradient.addColorStop(.88, '#45632c');
-      gradient.addColorStop(1, '#253820');
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, n, n);
-
-      for (let i = 0; i < 180; i++) {
-        const angle = i / 180 * Math.PI * 2;
-        const inner = n * (.17 + rnd() * .09);
-        const outer = n * (.40 + rnd() * .08);
-
-        ctx.strokeStyle = i % 2
-          ? 'rgba(219,196,91,.32)'
-          : 'rgba(31,64,27,.35)';
-        ctx.lineWidth = .8;
-
-        ctx.beginPath();
-        ctx.moveTo(
-          mid + Math.cos(angle) * inner,
-          mid + Math.sin(angle) * inner
-        );
-        ctx.lineTo(
-          mid + Math.cos(angle + .012) * outer,
-          mid + Math.sin(angle + .012) * outer
-        );
-        ctx.stroke();
-      }
-    });
-
-    const irisMat = new T.MeshStandardMaterial({
-      map: irisTexture,
-      roughness: .28,
-      metalness: 0
-    });
-
-    const glintMat = new T.MeshBasicMaterial({
-      color: '#fff6df',
-      toneMapped: false
-    });
-
-    for (const side of [-1, 1]) {
-      const eyeGroup = new T.Group();
-      eyeGroup.position.set(side * .119, .020, -.205);
-      eyeGroup.rotation.y = -side * .10;
-      head.add(eyeGroup);
-
-      ball(
-        eyeGroup, eyeRim,
-        0, 0, 0, .085, .080, .043
-      );
-
-      const iris = addMesh(
-        frontGeometry(), irisMat, eyeGroup
-      );
-      iris.position.z = -.030;
-      iris.scale.set(.071, .067, .021);
-
-      ball(
-        eyeGroup, pupilMat,
-        0, .003, -.047, .037, .051, .010
-      );
-
-      ball(
-        eyeGroup, glintMat,
-        -.022, .028, -.057, .012, .011, .003
-      );
-      ball(
-        eyeGroup, glintMat,
-        .016, -.025, -.056, .004, .004, .002
-      );
-
-      eyeGroup.traverse(object => {
-        if (object.isMesh) {
-          object.castShadow = false;
-          object.receiveShadow = false;
-        }
-      });
-    }
-
-    // ----------------------------------------------------------
-    // Whiskers and eyebrow hairs
-    // ----------------------------------------------------------
-    const whiskerMat = new T.LineBasicMaterial({
-      color: '#eadfc9',
-      transparent: true,
-      opacity: .78
-    });
-
-    for (const side of [-1, 1]) {
-      for (let i = 0; i < 4; i++) {
-        const curve = new T.CatmullRomCurve3([
-          V(side * .077, -.079 - i * .010, -.267),
-          V(side * .218, -.056 - i * .026, -.279),
-          V(
-            side * (.335 + i * .012),
-            -.031 - i * .040,
-            -.244
-          )
-        ]);
-
-        head.add(new T.Line(
-          new T.BufferGeometry().setFromPoints(
-            curve.getPoints(16)
-          ),
-          whiskerMat
-        ));
-      }
-
-      for (let i = 0; i < 3; i++) {
-        ball(
-          head, mouthMat,
-          side * (.058 + i * .018),
-          -.083 - (i % 2) * .016,
-          -.270 + i * .004,
-          .0025, .0025, .0015
-        );
-      }
-
-      for (let i = 0; i < 2; i++) {
-        const curve = new T.CatmullRomCurve3([
-          V(side * .11, .116, -.178),
-          V(side * .16, .172 + i * .015, -.185),
-          V(side * .21, .192 + i * .025, -.157)
-        ]);
-
-        head.add(new T.Line(
-          new T.BufferGeometry().setFromPoints(
-            curve.getPoints(10)
-          ),
-          whiskerMat
-        ));
-      }
-    }
-
-    // ----------------------------------------------------------
-    // Legs and paws
-    // Order: left-front, left-rear, right-front, right-rear
-    // ----------------------------------------------------------
-    const legs = [];
-
-    for (const x of [-.163, .163]) {
-      for (const z of [-.29, .30]) {
-        const leg = new T.Group();
-        leg.position.set(x, .45, z);
-        catBody.add(leg);
-
-        const rear = z > 0;
-
-        ball(
-          leg,
-          rear ? bodyFur : (x < 0 ? orangeFur : whiteFur),
-          0, -.102, rear ? .015 : 0,
-          rear ? .096 : .068,
-          .158,
-          rear ? .112 : .078
-        );
-
-        ball(
-          leg, whiteFur,
-          0, -.282, -.008,
-          .053, .120, .061
-        );
-
-        ball(
-          leg, whiteFur,
-          0, -.396, -.047,
-          .075, .054, .107
-        );
-
-        for (const offset of [-.025, .025]) {
-          tube(leg, [
-            V(offset, -.382, -.137),
-            V(offset, -.395, -.151),
-            V(offset, -.407, -.147)
-          ], .0015, mouthMat);
-        }
-
-        legs.push(leg);
-      }
-    }
-
-    // ----------------------------------------------------------
-    // Harness and rounded backpack
-    // ----------------------------------------------------------
-    function harnessRing(y, z, rx, ry) {
-      const ring = addMesh(
-        new T.TorusGeometry(1, .095, 8, 48),
-        harnessMat,
-        catBody
-      );
-
-      ring.position.set(0, y, z);
-      ring.scale.set(rx, ry, .26);
-      return ring;
-    }
-
-    harnessRing(.585, .065, .251, .259);
-    harnessRing(.694, -.328, .190, .190);
-
-    for (const side of [-1, 1]) {
-      const points = [
-        V(side * .133, .813, -.347),
-        V(side * .175, .853, -.185),
-        V(side * .179, .856, .063),
-        V(side * .228, .724, .172)
-      ];
-
-      tube(catBody, points, .024, harnessMat);
-
-      tube(
-        catBody,
-        points.map(point =>
-          point.clone().add(V(side * .017, .004, 0))
-        ),
-        .0035,
-        trimMat
-      );
-    }
-
-    function roundedBox(w, h, d, radius, mat) {
-      const shape = new T.Shape();
-      const x = -w / 2;
-      const y = -h / 2;
-      const r = radius;
-
-      shape.moveTo(x + r, y);
-      shape.lineTo(x + w - r, y);
-      shape.quadraticCurveTo(x + w, y, x + w, y + r);
-      shape.lineTo(x + w, y + h - r);
-      shape.quadraticCurveTo(
-        x + w, y + h, x + w - r, y + h
-      );
-      shape.lineTo(x + r, y + h);
-      shape.quadraticCurveTo(x, y + h, x, y + h - r);
-      shape.lineTo(x, y + r);
-      shape.quadraticCurveTo(x, y, x + r, y);
-
-      const geometry = new T.ExtrudeGeometry(shape, {
-        depth: d,
-        bevelEnabled: true,
-        bevelSegments: 3,
-        steps: 1,
-        bevelSize: .009,
-        bevelThickness: .009,
-        curveSegments: 8
-      });
-
-      geometry.translate(0, 0, -d / 2);
-      return addMesh(geometry, mat, catBody);
-    }
-
-    const pack = roundedBox(
-      .286, .126, .305, .036, harnessMat
-    );
-    pack.position.set(0, .865, .04);
-
-    const packPanel = roundedBox(
-      .222, .028, .238, .014, trimMat
-    );
-    packPanel.position.set(0, .938, .04);
-
-    const buckle = addMesh(
-      new T.TorusGeometry(.036, .006, 8, 24),
-      metalMat,
-      catBody
-    );
-    buckle.rotation.x = Math.PI / 2;
-    buckle.position.set(0, .963, -.026);
-    buckle.scale.set(1, 1.18, 1);
-
-    ball(
-      catBody, metalMat,
-      0, .526, -.466, .032, .039, .009
-    );
-
-    // ----------------------------------------------------------
-    // Articulated tail
-    // ----------------------------------------------------------
-    const tailRoot = new T.Group();
-    tailRoot.position.set(0, .646, .445);
-    catBody.add(tailRoot);
-
-    const tailBones = [];
-    let previous = tailRoot;
-
-    for (let i = 0; i < 7; i++) {
-      const bone = new T.Group();
-      if (i > 0) bone.position.set(0, .065, .12);
-      previous.add(bone);
-
-      const radius = .048 - i * .004;
-      const tailMat = i >= 4 ? blackFur : orangeFur;
-
-      tube(bone, [
-        V(0, 0, 0),
-        V(0, .030, .057),
-        V(0, .065, .12)
-      ], radius, tailMat);
-
-      ball(
-        bone, tailMat,
-        0, 0, 0, radius, radius, radius
-      );
-
-      if (i === 6) {
-        ball(
-          bone, tailMat,
-          0, .065, .12, radius, radius, radius
-        );
-      }
-
-      tailBones.push(bone);
-      previous = bone;
-    }
-
+    const ears = ['earL', 'earR'].map(joint);
+    ears.forEach(ear => { ear.userData.baseZ = ear.rotation.z; });
     return {
-      cat,
-      catBody,
-      head,
-      legs,
-      tailBones,
-      ears
+      cat, catBody,
+      head: joint('head'),
+      legs: ['legLF', 'legLB', 'legRF', 'legRB'].map(joint),
+      tailBones: Array.from({ length: 12 }, (_, i) => joint('tail' + i)),
+      ears,
+      eyes: ['eyeL', 'eyeR'].map(joint),
+      whiskers: joint('whiskers')
     };
   }
 
   const {
-    cat, catBody, head, legs, tailBones, ears
-  } = createReferenceCat();
+    cat, catBody, head, legs, tailBones, ears, eyes, whiskers
+  } = await createReferenceCat();
 
   // Batch only environmental primitives, never the cat or robot.
   batchStatics();
@@ -2183,7 +1550,10 @@ try {
     dialog: $('#dialog'),
     speaker: $('#speaker'),
     line: $('#line'),
-    journal: $('#journal')
+    journal: $('#journal'),
+    portrait: $('#portrait'),
+    newGame: $('#new-game'), saveState: $('#save-state'), menu: $('#game-menu'),
+    touchRun: $('#touch-run'), touchRest: $('#touch-rest'), touchPortrait: $('#touch-portrait'), touchInteract: $('#touch-interact')
   };
 
   function toast(text, duration = 3.8) {
@@ -2197,7 +1567,7 @@ try {
       .map((_, i) => discovered.has(i) ? '●' : '○')
       .join('');
 
-    ui.journal.innerHTML = '<h2>บันทึกจากตรอก</h2>' +
+    ui.journal.innerHTML = '<button id="close-journal" type="button">ปิดสมุด</button><h2>บันทึกจากตรอก</h2>' +
       places.map((place, i) => `
         <div class="entry">
           ${discovered.has(i)
@@ -2231,6 +1601,7 @@ try {
 
     if (nearest === null) return;
 
+    clearInput();
     activeDialog = nearest;
     dialogIndex = 0;
     resting = false;
@@ -2243,6 +1614,7 @@ try {
     if (!discovered.has(nearest)) {
       discovered.add(nearest);
       updateJournal();
+      saveGame();
 
       toast(
         discovered.size === places.length
@@ -2262,13 +1634,43 @@ try {
 
   let started = false;
   let jump = false;
-  let dragging = false;
-  let pointerX = 0;
-  let pointerY = 0;
+  const touchMove = { x: 0, z: 0 };
+  let touchRun = false;
+  let controller;
 
   let yaw = .08;
-  let pitch = .35;
-  let cameraDistance = 4.1;
+  let pitch = .27;
+  let cameraDistance = 3.25;
+  let portraitMode = false;
+  let savedOrbit = null;
+
+  function setPortrait(enabled) {
+    if (enabled === portraitMode || !started) return;
+    portraitMode = enabled;
+    clearInput();
+
+    if (enabled) {
+      savedOrbit = { yaw, pitch, cameraDistance };
+      yaw = cat.rotation.y + Math.PI + .22;
+      pitch = .12;
+      cameraDistance = 1.9;
+      closeDialog();
+      journalOpen = false;
+      ui.journal.style.display = 'none';
+      toast(touchMode ? 'ลากเพื่อหมุนดูน้อง · ใช้สองนิ้วซูม · แตะดูน้องเพื่อกลับ' : 'ลากเพื่อหมุนดูน้อง · เลื่อนเพื่อซูม · C หรือ Esc เพื่อกลับ', 5);
+    } else if (savedOrbit) {
+      ({ yaw, pitch, cameraDistance } = savedOrbit);
+      savedOrbit = null;
+    }
+    ui.touchPortrait.setAttribute('aria-pressed', String(enabled));
+    ui.portrait.setAttribute('aria-pressed', String(enabled));
+    ui.portrait.textContent = enabled ? 'C · กลับไปเดินเล่น' : 'C · มองน้องใกล้ ๆ';
+  }
+
+  ui.portrait.onclick = () => {
+    setPortrait(!portraitMode);
+    ui.portrait.blur();
+  };
 
   let audio;
   let meowEnd = 0;
@@ -2331,8 +1733,14 @@ try {
   let vy = 0;
   let grounded = true;
   const velocity = V();
+  const checkpoint = V(0, 0, 10.5);
+  const saves = support.saveStore(() => localStorage, places.length);
+  const resume = saves.read();
+  let lastAutoSave = performance.now();
 
   function resetCat() {
+    setPortrait(false);
+    clearInput();
     cat.position.set(0, 0, 10.5);
     cat.rotation.y = 0;
 
@@ -2343,141 +1751,126 @@ try {
     resting = false;
 
     yaw = .08;
-    pitch = .35;
+    pitch = .27;
+    cameraDistance = 3.25;
 
     closeDialog();
+    journalOpen = false; ui.journal.style.display = 'none';
+    checkpoint.copy(cat.position);
+    saveGame();
     toast('กลับมาที่ทางเข้าตรอก');
   }
 
-  addEventListener('keydown', event => {
-    if ([
-      'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
-    ].includes(event.code)) {
-      event.preventDefault();
-    }
-
+  function clearInput() {
+    keys.clear(); jump = false; touchRun = false;
+    touchMove.x = 0; touchMove.z = 0;
+    controller?.reset(); velocity.set(0, 0, 0);
+    ui.touchRun.setAttribute('aria-pressed', 'false');
+  }
+  function saveGame(manual = false) {
+    if (!started) return false;
+    const orbit = portraitMode && savedOrbit ? savedOrbit : { yaw, pitch, cameraDistance };
+    const ok = saves.write({ version: 1, game: 'afterlight', savedAt: Date.now(),
+      position: checkpoint.toArray(), rotation: Math.atan2(Math.sin(cat.rotation.y), Math.cos(cat.rotation.y)),
+      camera: { yaw: Math.atan2(Math.sin(orbit.yaw), Math.cos(orbit.yaw)), pitch: orbit.pitch, distance: orbit.cameraDistance },
+      discovered: [...discovered], resting });
+    ui.saveState.textContent = ok ? 'บันทึกแล้วในเครื่องนี้' : 'เซฟไม่ได้ · เบราว์เซอร์ไม่อนุญาตหรือพื้นที่เต็ม';
+    if (manual) toast(ok ? 'บันทึกแล้ว · กลับมาเล่นต่อในเบราว์เซอร์นี้ได้' : 'บันทึกไม่สำเร็จ · ตรวจสิทธิ์และพื้นที่เก็บข้อมูล', 5);
+    return ok;
+  }
+  function restoreGame(state) {
+    const [x, y, z] = state.position;
+    const supported = y < .06 || solids.some(solid => Math.abs(solid.top - y) < .08 && overlap(x, z, solid));
+    const safe = supported && !blocked(x, z, y);
+    cat.position.set(...(safe ? state.position : [0, 0, 10.5]));
+    checkpoint.copy(cat.position); cat.rotation.y = state.rotation;
+    yaw = state.camera.yaw; pitch = state.camera.pitch; cameraDistance = state.camera.distance;
+    resting = state.resting; vy = 0; grounded = true;
+    discovered.clear(); state.discovered.forEach(i => discovered.add(i));
+    clearInput(); updateJournal();
+    return safe;
+  }
+  function action(name) {
     if (!started) return;
-
-    keys.add(event.code);
-    if (event.repeat) return;
-
-    if (event.code === 'KeyE') interact();
-
-    if (event.code === 'Escape') {
-      closeDialog();
-      journalOpen = false;
-      ui.journal.style.display = 'none';
+    ui.menu.open = false;
+    if (name === 'interact' && !portraitMode && !journalOpen) interact();
+    if (name === 'jump' && grounded && activeDialog === null && !portraitMode && !journalOpen) jump = true;
+    if (name === 'meow') meow();
+    if (name === 'run' && activeDialog === null && !portraitMode && !journalOpen) {
+      touchRun = !touchRun; ui.touchRun.setAttribute('aria-pressed', String(touchRun));
     }
-
-    if (event.code === 'Space' && activeDialog === null) {
-      jump = true;
+    if (name === 'rest' && grounded && activeDialog === null && !portraitMode && !journalOpen) {
+      clearInput(); resting = !resting; saveGame();
     }
-
-    if (event.code === 'KeyQ') meow();
-
-    if (
-      event.code === 'KeyF' &&
-      grounded &&
-      activeDialog === null
-    ) {
-      resting = !resting;
-    }
-
-    if (event.code === 'KeyR') resetCat();
-
-    if (event.code === 'KeyH') {
-      document.body.classList.toggle('clean');
-    }
-
-    if (event.code === 'KeyJ') {
-      journalOpen = !journalOpen;
+    if (name === 'portrait') setPortrait(!portraitMode);
+    if (name === 'journal') {
+      clearInput(); closeDialog(); journalOpen = !journalOpen;
       ui.journal.style.display = journalOpen ? 'block' : 'none';
     }
+    if (name === 'reset') resetCat();
+    if (name === 'save') saveGame(true);
+    if (name === 'zoom-in' || name === 'zoom-out') zoom(name === 'zoom-in' ? .85 : 1.15);
+    if (name === 'close') { clearInput(); closeDialog(); journalOpen = false; ui.journal.style.display = 'none'; }
+  }
+  document.querySelectorAll('[data-action]').forEach(button => {
+    button.addEventListener('click', () => { action(button.dataset.action); button.blur(); });
   });
-
-  addEventListener('keyup', event => {
-    keys.delete(event.code);
+  ui.journal.addEventListener('click', event => { if (event.target.id === 'close-journal') action('close'); });
+  ui.menu.addEventListener('toggle', () => { if (ui.menu.open) clearInput(); });
+  addEventListener('keydown', event => {
+    if (!started || (event.code !== 'Escape' && event.target?.closest?.('button, summary, input, textarea, select'))) return;
+    if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) event.preventDefault();
+    keys.add(event.code);
+    if (event.repeat) return;
+    const actions = { KeyC: 'portrait', KeyE: 'interact', Space: 'jump', KeyQ: 'meow', KeyF: 'rest', KeyR: 'reset', KeyJ: 'journal' };
+    if (actions[event.code]) action(actions[event.code]);
+    if (event.code === 'Escape') { setPortrait(false); action('close'); document.body.classList.remove('clean'); }
+    if (event.code === 'KeyH') document.body.classList.toggle('clean');
   });
-
-  addEventListener('blur', () => {
-    keys.clear();
-    jump = false;
-    dragging = false;
-  });
-
+  addEventListener('keyup', event => keys.delete(event.code));
+  addEventListener('blur', clearInput);
+  addEventListener('pagehide', () => { saveGame(); clearInput(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { saveGame(); clearInput(); } });
   const canvas = renderer.domElement;
-
-  canvas.addEventListener('pointerdown', event => {
-    if (!started || !event.isPrimary) return;
-
-    dragging = true;
-    pointerX = event.clientX;
-    pointerY = event.clientY;
-    canvas.setPointerCapture(event.pointerId);
+  function zoom(factor) { cameraDistance = T.MathUtils.clamp(cameraDistance * factor, portraitMode ? 1.15 : 1.65, 5.5); }
+  controller = support.touchController({
+    joystick: $('#joystick'), knob: $('#stick'), canvas,
+    enabled: () => started && !document.hidden && !ui.menu.open && activeDialog === null && !journalOpen,
+    onMove: (x, z) => { touchMove.x = x; touchMove.z = z; },
+    onOrbit: (x, y) => { yaw -= x * .005; pitch = T.MathUtils.clamp(pitch + y * .004, .12, .95); }, onZoom: zoom
   });
-
-  canvas.addEventListener('pointerup', event => {
-    if (event.isPrimary) dragging = false;
-  });
-
-  canvas.addEventListener('pointercancel', () => {
-    dragging = false;
-  });
-
-  canvas.addEventListener('lostpointercapture', () => {
-    dragging = false;
-  });
-
-  canvas.addEventListener('pointermove', event => {
-    if (!dragging || !event.isPrimary) return;
-
-    const movementX = event.clientX - pointerX;
-    const movementY = event.clientY - pointerY;
-    pointerX = event.clientX;
-    pointerY = event.clientY;
-
-    yaw -= movementX * .005;
-    pitch = T.MathUtils.clamp(
-      pitch + movementY * .004, .12, .95
-    );
-  });
-
   canvas.addEventListener('wheel', event => {
-    event.preventDefault();
-
     if (!started) return;
-
-    cameraDistance = T.MathUtils.clamp(
-      cameraDistance + event.deltaY * .003,
-      1.65,
-      5.5
-    );
-  }, { passive: false });
-
-  canvas.addEventListener('contextmenu', event => {
     event.preventDefault();
-  });
-
-  ui.play.disabled = false;
-  ui.play.textContent = 'เข้าตรอก';
-  ui.status.textContent =
-    'พร้อมแล้ว • ใช้คีย์บอร์ดเดิน และลากเมาส์หมุนดูตัวแมว';
-
-  ui.play.onclick = () => {
+    cameraDistance = T.MathUtils.clamp(cameraDistance + event.deltaY * .003, portraitMode ? 1.15 : 1.65, 5.5);
+  }, { passive: false });
+  canvas.addEventListener('contextmenu', event => event.preventDefault());
+  function startGame(useSaved) {
+    clearInput();
+    const safe = useSaved && resume.state ? restoreGame(resume.state) : true;
     started = true;
-    ui.cover.style.display = 'none';
-
-    toast(
-      'ไม่ต้องรีบ — ลองฟังวิทยุทางซ้ายก่อนก็ได้',
-      5
-    );
-  };
+    ui.cover.style.display = 'none'; ui.menu.hidden = false;
+    document.body.classList.add('playing');
+    ui.play.blur(); ui.newGame.blur();
+    lastAutoSave = performance.now(); saveGame();
+    toast(useSaved ? (safe ? 'กลับมาแล้ว · เล่นต่อจากจุดที่บันทึกไว้' : 'จุดเดิมไม่ปลอดภัย · พากลับทางเข้าโดยเก็บเรื่องเล่าไว้แล้ว') :
+      (touchMode ? 'จอยซ้ายเดิน · ลากฉากเพื่อหมุนกล้อง · ใช้สองนิ้วซูม' : 'ไม่ต้องรีบ — ลองฟังวิทยุทางซ้ายก่อนก็ได้'), 6);
+  }
+  ui.play.disabled = false;
+  ui.play.textContent = resume.state ? 'เล่นต่อ' : 'เข้าตรอก';
+  ui.newGame.hidden = !resume.state;
+  ui.status.textContent = resume.issue === 'storage' ? 'เล่นได้ แต่เบราว์เซอร์นี้ไม่อนุญาตให้อ่านเซฟ' :
+    resume.issue === 'invalid' ? 'อ่านเซฟเดิมไม่ได้ · เริ่มเกมเพื่อสร้างเซฟใหม่' :
+    resume.state ? 'พบเซฟเดิม · ตำแหน่งและเรื่องเล่าพร้อมเล่นต่อ' :
+    touchMode ? 'พร้อมแล้ว · จอยซ้ายเดิน · ลากฉากหมุนกล้อง' : 'พร้อมแล้ว · WASD เดิน · C มองน้องใกล้ ๆ';
+  ui.play.onclick = () => startGame(Boolean(resume.state));
+  ui.newGame.onclick = () => { if (confirm('เริ่มใหม่และแทนที่เซฟเดิมในเบราว์เซอร์นี้?')) startGame(false); };
 
   // ============================================================
   // Kinematic movement and collisions
   // ============================================================
   const catRadius = .235;
-  const catHeight = 1.22;
+  const catHeight = 1.30;
 
   function overlap(x, z, solid) {
     return (
@@ -2581,11 +1974,16 @@ try {
 
   function updateCamera(dt) {
     target.copy(cat.position);
-    target.y += resting ? .55 : .77;
+    target.y += portraitMode ? (resting ? .63 : .83) : (resting ? .55 : .73);
+    const fov = portraitMode ? 43 : 53;
+    if (Math.abs(camera.fov - fov) > .01) {
+      camera.fov = T.MathUtils.lerp(camera.fov, fov, 1 - Math.exp(-7 * dt));
+      camera.updateProjectionMatrix();
+    }
 
     desired.set(
       Math.sin(yaw) * cameraDistance * Math.cos(pitch),
-      Math.sin(pitch) * cameraDistance + .3,
+      Math.sin(pitch) * cameraDistance + (portraitMode ? 0 : .2),
       Math.cos(yaw) * cameraDistance * Math.cos(pitch)
     ).add(target);
 
@@ -2647,6 +2045,9 @@ try {
   // ============================================================
   let last = performance.now();
   let walkPhase = 0;
+  let tailPhase = 0;
+  let tailTurn = 0;
+  let previousFacing = cat.rotation.y;
   const before = V();
 
   function frame(now) {
@@ -2654,23 +2055,24 @@ try {
 
     const dt = Math.min((now - last) / 1000, .033);
     last = now;
+    if (document.hidden) return;
 
     const time = now / 1000;
 
     const ix = started
       ? Number(keys.has('KeyD') || keys.has('ArrowRight')) -
-        Number(keys.has('KeyA') || keys.has('ArrowLeft'))
+        Number(keys.has('KeyA') || keys.has('ArrowLeft')) + touchMove.x
       : 0;
 
     const iz = started
       ? Number(keys.has('KeyW') || keys.has('ArrowUp')) -
-        Number(keys.has('KeyS') || keys.has('ArrowDown'))
+        Number(keys.has('KeyS') || keys.has('ArrowDown')) + touchMove.z
       : 0;
 
-    const canMove = activeDialog === null;
+    const canMove = started && activeDialog === null && !portraitMode && !journalOpen && !ui.menu.open;
     const input = (ix !== 0 || iz !== 0) && canMove;
     const running =
-      keys.has('ShiftLeft') || keys.has('ShiftRight');
+      touchRun || keys.has('ShiftLeft') || keys.has('ShiftRight');
 
     let dx = 0;
     let dz = 0;
@@ -2678,7 +2080,7 @@ try {
     if (input) {
       resting = false;
 
-      const length = Math.hypot(ix, iz);
+      const length = Math.max(1, Math.hypot(ix, iz));
 
       dx = (
         Math.cos(yaw) * ix -
@@ -2701,7 +2103,7 @@ try {
       velocity.z, dz * speed, velocityBlend
     );
 
-    if (activeDialog !== null || resting) {
+    if (!canMove || resting) {
       velocity.set(0, 0, 0);
     }
 
@@ -2715,6 +2117,8 @@ try {
 
     before.copy(cat.position);
     physics(dt);
+    if (started && grounded && !blocked(cat.position.x, cat.position.z, cat.position.y)) checkpoint.copy(cat.position);
+    if (started && now - lastAutoSave >= 5000) { saveGame(); lastAutoSave = now; }
 
     const moved = Math.hypot(
       cat.position.x - before.x,
@@ -2792,6 +2196,19 @@ try {
       Math.min(1, dt * 5)
     );
 
+    // A short double blink every few seconds, with a sleepy resting expression.
+    const blinkPhase = time % 5.8;
+    const blink = blinkPhase < .18
+      ? Math.sin(blinkPhase / .18 * Math.PI)
+      : blinkPhase > .32 && blinkPhase < .46
+        ? Math.sin((blinkPhase - .32) / .14 * Math.PI) * .75
+        : 0;
+    eyes.forEach(eye => {
+      eye.scale.y = Math.max(.08, (resting ? .6 : 1) - blink * .92);
+    });
+    whiskers.rotation.x = Math.sin(time * 2.2) * .015 +
+      (now < meowEnd ? -.08 : 0);
+
     ears.forEach((ear, i) => {
       const twitch = Math.pow(
         Math.max(0, Math.sin(time * .72 + i * 2.6)),
@@ -2807,16 +2224,17 @@ try {
         : Math.sin(time * .8 + i) * .018;
     });
 
+    tailPhase += dt * (resting ? .65 : walking && running ? 2.1 : walking ? 1.45 : .95);
+    const facingDelta = Math.atan2(Math.sin(cat.rotation.y - previousFacing), Math.cos(cat.rotation.y - previousFacing));
+    previousFacing = cat.rotation.y;
+    tailTurn = T.MathUtils.lerp(tailTurn, T.MathUtils.clamp(facingDelta / Math.max(dt, .001), -1, 1), 1 - Math.exp(-3 * dt));
+    const tailTargets = support.tailPose(tailPhase, resting ? 'rest' : walking && running ? 'run' : 'idle', tailTurn, tailBones.length);
+    const tailBlend = 1 - Math.exp(-4 * dt);
     tailBones.forEach((bone, i) => {
-      bone.rotation.z =
-        Math.sin(time * 2.2 - i * .5) *
-        (resting ? .035 : .075);
-
-      bone.rotation.x = resting
-        ? .14
-        : walking && running
-          ? .04
-          : -.02;
+      const pose = tailTargets[i];
+      bone.rotation.x = T.MathUtils.lerp(bone.rotation.x, pose.x, tailBlend);
+      bone.rotation.y = T.MathUtils.lerp(bone.rotation.y, pose.y, tailBlend);
+      bone.rotation.z = T.MathUtils.lerp(bone.rotation.z, pose.z, tailBlend);
     });
 
     // ----------------------------------------------------------
@@ -2842,14 +2260,17 @@ try {
     });
 
     ui.hint.style.display =
-      nearest !== null && activeDialog === null
+      nearest !== null && activeDialog === null && !portraitMode && !journalOpen && !ui.menu.open
         ? 'block'
         : 'none';
 
     if (nearest !== null) {
-      ui.hint.textContent = 'E · ' + places[nearest].title;
+      ui.hint.textContent = (touchMode ? 'แตะสำรวจ · ' : 'E · ') + places[nearest].title;
     }
 
+    ui.touchInteract.disabled = portraitMode || journalOpen || (nearest === null && activeDialog === null);
+    ui.touchInteract.textContent = activeDialog === null ? 'สำรวจ' : 'อ่านต่อ';
+    ui.touchRest.setAttribute('aria-pressed', String(resting));
     ui.area.textContent = resting
       ? 'พักสักครู่'
       : cat.position.y > 2
@@ -2893,6 +2314,7 @@ try {
   requestAnimationFrame(frame);
 
   addEventListener('resize', () => {
+    clearInput();
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
 

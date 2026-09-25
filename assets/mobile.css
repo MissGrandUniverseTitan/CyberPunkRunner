@@ -1,0 +1,54 @@
+/* Safe areas and touch controls, for normal mobile browsers. */
+body { overscroll-behavior: none; }
+button { min-height: 44px; touch-action: manipulation; }
+[hidden] { display: none !important; }
+#cover { overflow-y: auto; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+#new-game { margin: 12px 0 0 10px; padding: 10px 18px; border: 1px solid #ddbb8566; background: transparent; color: var(--cream); }
+.save-note { font-size: 11px !important; line-height: 1.6 !important; }
+.progress { top: calc(72px + env(safe-area-inset-top)); }
+#save-state { display: block; color: #afc6b9; font-size: 10px; }
+#game-menu { position: absolute; top: calc(16px + env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); pointer-events: auto; z-index: 4; }
+#game-menu summary { cursor: pointer; padding: 11px 18px; border: 1px solid #d7c79a55; border-radius: 22px; background: #14201ee8; font-size: 12px; }
+#game-menu .menu-panel { position: absolute; right: 0; margin-top: 8px; padding: 8px; width: 190px; display: grid; gap: 6px; background: #14201efa; border: 1px solid #d7c79a55; border-radius: 12px; max-height: calc(100dvh - 90px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow: auto; }
+.menu-panel button, .dialog-actions button { border: 1px solid #d7c79a44; border-radius: 8px; background: #283833; color: var(--cream); padding: 8px 12px; }
+#dialog { pointer-events: auto; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+#mobile-controls { display: none; position: fixed; inset: 0; z-index: 2; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.touch.playing #mobile-controls { display: block; }
+#joystick { position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 112px; height: 112px; border: 1px solid #eadfc966; border-radius: 50%; background: #101c1a99; pointer-events: auto; touch-action: none; }
+#stick { position: absolute; left: 34px; top: 34px; width: 44px; height: 44px; border-radius: 50%; background: #e6cc9bcc; border: 1px solid #fff6; pointer-events: none; }
+#joystick-label { position: absolute; width: 100%; bottom: -20px; text-align: center; color: #eadfc9aa; font-size: 10px; }
+#mobile-actions { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(2, 64px); gap: 7px; pointer-events: auto; }
+#mobile-actions button { min-height: 46px; padding: 7px 4px; border: 1px solid #eadfc966; border-radius: 14px; color: var(--cream); background: #14201edb; font-size: 12px; touch-action: none; }
+#mobile-actions button[aria-pressed="true"] { background: #dcc08a; color: #17201a; }
+#mobile-actions button:disabled { opacity: .35; }
+.touch .controls, .touch .keyboard-only, .touch #portrait { display: none; }
+.touch .brand { left: max(14px, env(safe-area-inset-left)); top: calc(12px + env(safe-area-inset-top)); }
+.touch .brand .eyebrow { display: none; }
+.touch h1 { font-size: 20px; letter-spacing: 3px; margin: 4px 0; }
+.touch .subtitle { font-size: 11px; }
+.touch .progress { top: calc(68px + env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); font-size: 10px; }
+.touch #dots { font-size: 15px; letter-spacing: 5px; }
+.touch #area { left: max(14px, env(safe-area-inset-left)); bottom: calc(165px + env(safe-area-inset-bottom)); font-size: 10px; }
+.touch #hint { bottom: calc(188px + env(safe-area-inset-bottom)); max-width: 88vw; padding: 8px 12px; font-size: 11px; white-space: normal; text-align: center; }
+.touch #toast { top: calc(128px + env(safe-area-inset-top)); font-size: 12px; padding: 8px 12px; }
+.touch #dialog { top: calc(66px + env(safe-area-inset-top)); bottom: auto; max-height: calc(100dvh - 250px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; padding: 12px 16px; z-index: 3; }
+.touch #line { font-size: 14px; line-height: 1.6; margin: 10px 0; }
+.touch #speaker { padding-bottom: 7px; }
+.touch #journal { top: calc(72px + env(safe-area-inset-top)); right: 14px; max-height: calc(100dvh - 250px); padding: 16px; z-index: 3; }
+@media(max-height:500px) {
+ .intro { padding: 18px 26px; }
+ .intro h2 { font-size: 32px; margin: 6px 0; }
+ .intro p { margin: 8px 0; font-size: 12px; }
+ #play { margin-top: 5px; }
+ .touch #mobile-actions { grid-template-columns: repeat(3, 60px); }
+ .touch #joystick { bottom: calc(18px + env(safe-area-inset-bottom)); width: 96px; height: 96px; }
+ .touch #stick { left: 26px; top: 26px; }
+ .touch #area { bottom: calc(128px + env(safe-area-inset-bottom)); }
+ .touch #hint { bottom: calc(125px + env(safe-area-inset-bottom)); max-width: 45vw; }
+ .touch #dialog { top: calc(12px + env(safe-area-inset-top)); width: min(480px,60vw); max-height: calc(100dvh - 148px - env(safe-area-inset-bottom)); }
+ .touch #journal { max-height: calc(100dvh - 182px); }
+ .touch #toast { top: 66px; max-width: 46vw; }
+}
+#hud { z-index: 3; }
+#close-journal { float: right; padding: 8px 12px; color: var(--cream); border: 1px solid #d7c79a55; border-radius: 8px; background: #283833; }

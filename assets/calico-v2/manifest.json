@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "byteLength": 5519712,
+  "sha256": "1351c78ca84be6f58201fe7f85e7e758092c379c037db2a10e07630b3ef3f7ae",
+  "parts": [
+    "part-00.bin",
+    "part-01.bin",
+    "part-02.bin",
+    "part-03.bin",
+    "part-04.bin",
+    "part-05.bin",
+    "part-06.bin",
+    "part-07.bin",
+    "part-08.bin",
+    "part-09.bin",
+    "part-10.bin",
+    "part-11.bin",
+    "part-12.bin",
+    "part-13.bin",
+    "part-14.bin"
+  ]
+}

@@ -1,0 +1,5 @@
+__pycache__/
+review/*.pkl
+assets/calico-v2.glb
+review/*.png
+review/*.gif
