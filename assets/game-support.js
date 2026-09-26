@@ -95,6 +95,40 @@
     };
     return { reset, destroy() { reset(); listeners.forEach(remove => remove()); } };
   }
+  // Critical game actions must fire on every pointer's down event, including
+  // non-primary fingers. Browser-synthesized clicks are not reliable multitouch input.
+  function bindPressAction(button, onPress) {
+    let pointer = null;
+    const listeners = [];
+    const listen = (name, fn) => {
+      button.addEventListener(name, fn, { passive: false });
+      listeners.push(() => button.removeEventListener(name, fn));
+    };
+    function reset() {
+      const id = pointer; pointer = null;
+      button.removeAttribute('data-pressed');
+      try { if (id !== null && button.hasPointerCapture(id)) button.releasePointerCapture(id); } catch {}
+    }
+    listen('pointerdown', event => {
+      if (button.disabled || pointer !== null || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      event.preventDefault(); event.stopPropagation();
+      pointer = event.pointerId;
+      button.setAttribute('data-pressed', 'true');
+      try { button.setPointerCapture(pointer); } catch {}
+      onPress();
+    });
+    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) listen(name, event => {
+      if (event.pointerId !== pointer) return;
+      event.preventDefault(); reset();
+    });
+    listen('click', event => {
+      event.preventDefault(); event.stopPropagation();
+      // Keep keyboard and assistive-technology activation; never run a touch twice.
+      if (!button.disabled && event.detail === 0 && !event.pointerType) onPress();
+    });
+    listen('contextmenu', event => event.preventDefault());
+    return { reset, destroy() { reset(); listeners.forEach(remove => remove()); } };
+  }
   // Small overlapping bends travel outwards. Phase is integrated by the game,
   // so changing gait never jumps to a different sine-wave position.
   function tailPose(phase, mode, turn = 0, count = 12) {
@@ -138,5 +172,5 @@
     parts.forEach(part => { bytes.set(part, offset); offset += part.length; });
     return bytes;
   }
-  window.AfterlightSupport = Object.freeze({ stick, parseSave, saveStore, touchController, tailPose, loadModelParts });
+  window.AfterlightSupport = Object.freeze({ stick, parseSave, saveStore, touchController, bindPressAction, tailPose, loadModelParts });
 })();

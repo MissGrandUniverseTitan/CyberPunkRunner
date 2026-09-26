@@ -69,7 +69,7 @@ const section=html.slice(html.indexOf('  function clearInput()'),html.indexOf(" 
 class Vec {constructor(x=0,y=0,z=0){this.set(x,y,z);}set(x,y,z){Object.assign(this,{x,y,z});return this;}copy(v){return this.set(v.x,v.y,v.z);}toArray(){return [this.x,this.y,this.z];}}
 const element=()=>({style:{},setAttribute(){}});
 let blocked=false;
-const game=vm.createContext({console,Date,Math,Set,controller:undefined,keys:new Set(),jump:false,touchRun:false,touchMove:{x:0,z:0},velocity:new Vec(),
+const game=vm.createContext({console,Date,Math,Set,controller:undefined,keys:new Set(),jump:false,jumpBuffer:0,coyoteTime:0,actionPresses:[],touchRun:false,touchMove:{x:0,z:0},velocity:new Vec(),
  ui:{touchRun:element(),saveState:element(),menu:{open:false},journal:element()},started:false,portraitMode:false,savedOrbit:null,yaw:.3,pitch:.27,cameraDistance:3.25,
  checkpoint:new Vec(1,0,3),cat:{position:new Vec(),rotation:{y:.5}},saves:saveStore(()=>storage,4),discovered:new Set([0,2]),resting:true,
  solids:[],overlap:()=>true,blocked:()=>blocked,vy:3,grounded:false,updateJournal(){},toast(){},activeDialog:null,journalOpen:false,
@@ -101,6 +101,7 @@ const afterHide=writes;game.started=false;handlers.pagehide();assert.equal(write
 game.started=true;game.resume={state};game.touchMode=true;game.performance={now:()=>12345};game.lastAutoSave=0;
 game.document.body={classList:{add(){}}};game.ui.cover=element();game.ui.play={blur(){}};game.ui.newGame={blur(){}};
 vm.runInContext(html.slice(html.indexOf('  function startGame(useSaved)'),html.indexOf('  ui.play.disabled = false;',html.indexOf('  function startGame(useSaved)'))),game);
-game.startGame(true);assert.deepEqual(game.cat.position.toArray(),state.position);assert.deepEqual([...game.discovered],state.discovered);
+let motionResets = 0; game.resetMotion = () => { motionResets++; };
+game.startGame(true);assert.equal(motionResets,1);assert.deepEqual(game.cat.position.toArray(),state.position);assert.deepEqual([...game.discovered],state.discovered);
 assert.equal(game.ui.cover.style.display,'none');assert.equal(game.lastAutoSave,12345);assert.equal(saves.read().state.resting,true);
 console.log('PASS: actual pagehide/visibility handlers and Continue launch restore progress before saving');

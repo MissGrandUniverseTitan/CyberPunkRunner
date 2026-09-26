@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.1
+
+- Allow direction, run and jump together using independent pointer-down actions.
+- Add buffered jumps and ledge grace; verify the actual crate-to-balcony route.
+- Remove distance-triggered camera snaps; smooth orbit/zoom and wall-edge recovery.
+- Add fixed-rate movement with interpolated rendering across frame rates.
+- Add adaptive rendering budgets, mobile direct rendering and desktop MSAA.
+- Reduce distant fur shimmer and retain joystick input during browser-bar resizing.
+- Keep the existing save format and losslessly packaged character assets.
+
+Validation: actual movement/camera functions pass frame-rate regression tests;
+real-device WebGL smoothness has not yet been measured.
+
 ## 2.2.0
 
 - Rename the Thai title to ตรอกนิรันดร์.

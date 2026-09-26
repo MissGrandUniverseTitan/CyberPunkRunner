@@ -1,6 +1,6 @@
 # AFTERLIGHT — ตรอกนิรันดร์
 
-Current version: **2.2.0**. See [CHANGELOG.md](CHANGELOG.md).
+Current version: **2.2.1**. See [CHANGELOG.md](CHANGELOG.md).
 
 A small Three.js exploration game. Calico V2.2 replaces the assembled primitive cat
 with a continuous sculpted mesh, vertex-painted calico markings, fur geometry,
@@ -45,7 +45,7 @@ buttons to jump, meow, interact, rest or inspect the cat. Drag the scene to orbi
 pinch with two fingers to zoom, including while another finger holds the joystick.
 The menu also offers zoom, journal, manual save and return to the entrance.
 Controls adapt to portrait/landscape and screen safe areas. Touch devices use a
-pixel ratio capped at 1, 1024 px shadows and no bloom to reduce rendering load.
+pixel ratio capped at 1 with an adaptive pixel budget, 1024 px shadows and direct antialiased rendering without bloom.
 Keyboard and mouse controls remain available.
 
 Progress saves every five seconds, when discovering a story, when resting or
@@ -106,3 +106,45 @@ The deployed GLB is stored losslessly as `assets/calico-v2/part-*.bin` with a
 manifest. The loader fetches up to four parts concurrently and assembles the
 original GLB before parsing. `tools/model_parts.py` verifies the combined SHA-256.
 The full generated GLB and review images are local build outputs excluded from Git.
+
+## Smooth motion revision (2.2.1, pending publication)
+
+- Movement uses a 60 Hz simulation with interpolation between snapshots. Normal
+  low frame rates no longer discard time at a 33 ms cap; pauses have a bounded
+  100 ms catch-up budget. Saves use the simulation pose, never an interpolated one.
+- The camera follows the interpolated horizontal position and damps height, orbit
+  and zoom. Collision changes no longer trigger distance-based position snaps;
+  a short hold prevents alternating wall-edge hits from pumping the camera.
+- Mobile renders directly to the antialiased canvas. Desktop bloom uses an MSAA
+  target when supported by the selected texture format. Both modes have capped
+  pixel budgets and an automatic three-level quality governor with cooldowns.
+  Sustained load lowers resolution and bypasses bloom; sustained recovery restores
+  quality. Distant fine fur is hidden with hysteresis to reduce subpixel shimmer.
+- Mobile address-bar height changes do not cancel held joystick input.
+
+```sh
+node tools/test_motion.cjs
+node tools/test_game_support.cjs
+node tools/test_model_parts.cjs
+```
+
+Motion tests execute the actual game movement and camera functions with vector/ray
+test doubles. They compare 30/60/120/144 Hz and uneven frame intervals, collisions,
+jumps, wall-edge camera behavior and quality transitions. This is not a browser
+frame-rate benchmark; device FPS and WebGL/MSAA appearance still need live testing.
+
+### Combined movement controls
+
+Mobile Run and Jump now respond on `pointerdown`, including non-primary fingers.
+Each button owns its pointer capture independently from the movement joystick and
+camera. Synthesized clicks cannot repeat an action. Run remains a toggle (วิ่ง: เปิด),
+so two thumbs can steer and jump continuously without holding a third button.
+Keyboard W/arrow movement + Shift + Space also works when a game button had focus.
+Jump requests allow a 120 ms landing buffer and a 90 ms ledge grace period, with no
+midair double jump. Blur and modal transitions clear all pending input.
+
+`node tools/test_combined_input.cjs` executes the actual action bindings, keyboard
+handler, movement and collision functions with simulated pointer events. It checks
+three simultaneous fingers, two-thumb play, release/cancel, duplicate clicks, and
+the level's three crates and 2.65 m balcony. Device/browser multitouch behavior
+still needs hands-on verification; these are code-level regression tests.

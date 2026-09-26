@@ -52,3 +52,7 @@ button { min-height: 44px; touch-action: manipulation; }
 }
 #hud { z-index: 3; }
 #close-journal { float: right; padding: 8px 12px; color: var(--cream); border: 1px solid #d7c79a55; border-radius: 8px; background: #283833; }
+
+#mobile-actions #touch-jump { background: #365749ef; border-color: #dfc68d; font-weight: 600; }
+#mobile-actions button[data-pressed="true"] { transform: scale(.95); border-color: #fff1cf; }
+#mobile-controls, #mobile-controls button { -webkit-touch-callout: none; }
